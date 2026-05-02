@@ -1,0 +1,491 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BingoFest — Minha Cartela</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Nunito:wght@400;600;700;900&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#07070e;--card:#0f0f1e;--accent:#f7c948;--pink:#ff4d8d;
+  --blue:#4d9fff;--green:#3dffc0;--purple:#b06dff;--red:#ff5252;
+  --text:#f0eeff;--muted:#6666aa;--border:rgba(255,255,255,0.07);
+  --B:#4d9fff;--I:#f7c948;--N:#ff4d8d;--G:#3dffc0;--O:#b06dff;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{background:var(--bg);color:var(--text);font-family:'Nunito',sans-serif;min-height:100vh;overflow-x:hidden;}
+body::before{content:'';position:fixed;inset:0;pointer-events:none;
+  background:radial-gradient(ellipse 60% 40% at 15% 15%,rgba(255,77,141,0.07) 0%,transparent 60%),
+             radial-gradient(ellipse 50% 50% at 85% 85%,rgba(77,159,255,0.06) 0%,transparent 60%);}
+
+/* HEADER */
+.header{position:sticky;top:0;z-index:50;background:rgba(7,7,14,0.97);
+  border-bottom:1px solid var(--border);padding:0.8rem 1.5rem;
+  display:flex;align-items:center;justify-content:space-between;backdrop-filter:blur(12px);}
+.logo{font-family:'Bebas Neue',sans-serif;font-size:1.4rem;letter-spacing:3px;
+  background:linear-gradient(135deg,var(--accent),var(--pink));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;}
+.live-badge{display:flex;align-items:center;gap:0.4rem;background:rgba(255,82,82,0.1);
+  border:1px solid rgba(255,82,82,0.2);color:#ff5252;font-size:0.7rem;font-weight:700;
+  letter-spacing:2px;padding:0.35rem 0.8rem;border-radius:20px;text-transform:uppercase;}
+.live-dot{width:6px;height:6px;border-radius:50%;background:#ff5252;animation:pulse 1.2s ease-in-out infinite;}
+@keyframes pulse{0%,100%{transform:scale(1);opacity:1}50%{transform:scale(0.7);opacity:0.5}}
+.conn-badge{display:flex;align-items:center;gap:0.4rem;font-size:0.7rem;color:var(--muted);}
+.conn-dot{width:6px;height:6px;border-radius:50%;background:var(--muted);}
+.conn-dot.ok{background:var(--green);animation:pulse 1.5s ease-in-out infinite;}
+
+/* MAIN */
+.main{max-width:900px;margin:0 auto;padding:1.5rem;position:relative;z-index:1;}
+
+/* NOME TAG */
+.nome-tag{text-align:center;margin-bottom:1.2rem;}
+.nome-tag h2{font-family:'Bebas Neue',sans-serif;font-size:1.8rem;letter-spacing:3px;}
+.nome-tag p{color:var(--muted);font-size:0.8rem;margin-top:0.2rem;}
+
+/* BOLA DO ÚLTIMO NÚMERO */
+.ultimo-num{background:var(--card);border:1px solid var(--border);
+  border-radius:16px;padding:1rem 1.5rem;margin-bottom:1.2rem;
+  display:flex;align-items:center;gap:1.5rem;flex-wrap:wrap;}
+.un-label{font-size:0.65rem;letter-spacing:2px;text-transform:uppercase;color:var(--muted);flex-shrink:0;}
+.un-ball{width:60px;height:60px;border-radius:50%;flex-shrink:0;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  background:linear-gradient(145deg,#1a1a35,#0d0d22);border:2px solid var(--border);
+  transition:all 0.4s;}
+.un-ball.pop{animation:bpop 0.5s cubic-bezier(0.34,1.56,0.64,1);}
+@keyframes bpop{0%{transform:scale(0.3);opacity:0}60%{transform:scale(1.2)}100%{transform:scale(1);opacity:1}}
+.un-ball.B{border-color:var(--B);box-shadow:0 0 20px rgba(77,159,255,0.3);}
+.un-ball.I{border-color:var(--I);box-shadow:0 0 20px rgba(247,201,72,0.3);}
+.un-ball.N{border-color:var(--N);box-shadow:0 0 20px rgba(255,77,141,0.3);}
+.un-ball.G{border-color:var(--G);box-shadow:0 0 20px rgba(61,255,192,0.3);}
+.un-ball.O{border-color:var(--O);box-shadow:0 0 20px rgba(176,109,255,0.3);}
+.un-l{font-family:'Bebas Neue',sans-serif;font-size:0.7rem;letter-spacing:2px;line-height:1;}
+.un-n{font-family:'Bebas Neue',sans-serif;font-size:1.8rem;line-height:1;}
+.un-ball.B .un-l,.un-ball.B .un-n{color:var(--B)}.un-ball.I .un-l,.un-ball.I .un-n{color:var(--I)}
+.un-ball.N .un-l,.un-ball.N .un-n{color:var(--N)}.un-ball.G .un-l,.un-ball.G .un-n{color:var(--G)}
+.un-ball.O .un-l,.un-ball.O .un-n{color:var(--O)}
+.un-wait{color:var(--muted);font-size:0.85rem;}
+.recentes{display:flex;gap:5px;flex-wrap:wrap;align-items:center;}
+.rec-item{font-family:'Bebas Neue',sans-serif;font-size:0.72rem;padding:0.2rem 0.4rem;border-radius:5px;border:1px solid;}
+.rec-item.B{color:var(--B);border-color:rgba(77,159,255,0.3);background:rgba(77,159,255,0.08)}
+.rec-item.I{color:var(--I);border-color:rgba(247,201,72,0.3);background:rgba(247,201,72,0.08)}
+.rec-item.N{color:var(--N);border-color:rgba(255,77,141,0.3);background:rgba(255,77,141,0.08)}
+.rec-item.G{color:var(--G);border-color:rgba(61,255,192,0.3);background:rgba(61,255,192,0.08)}
+.rec-item.O{color:var(--O);border-color:rgba(176,109,255,0.3);background:rgba(176,109,255,0.08)}
+
+/* INSTRUÇÃO */
+.instrucao{text-align:center;color:var(--muted);font-size:0.8rem;margin-bottom:1rem;
+  background:rgba(247,201,72,0.05);border:1px solid rgba(247,201,72,0.1);
+  border-radius:10px;padding:0.6rem;}
+
+/* GRID DE CARTELAS */
+.cartelas-grid{display:grid;gap:1rem;margin-bottom:1.2rem;}
+.cartelas-grid.c1{grid-template-columns:1fr;max-width:320px;margin:0 auto 1.2rem;}
+.cartelas-grid.c2{grid-template-columns:repeat(2,1fr);}
+.cartelas-grid.c3,.cartelas-grid.c4{grid-template-columns:repeat(2,1fr);}
+.cartelas-grid.c5p{grid-template-columns:repeat(2,1fr);}
+
+/* CARTELA */
+.cartela-wrap{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:0.9rem;transition:border-color 0.3s;}
+.cartela-wrap.bingo-hit{border-color:rgba(61,255,192,0.5);box-shadow:0 0 20px rgba(61,255,192,0.1);}
+.c-id{font-size:0.6rem;letter-spacing:2px;text-transform:uppercase;color:var(--muted);
+  margin-bottom:0.5rem;display:flex;align-items:center;justify-content:space-between;}
+.c-bingo-tag{background:linear-gradient(135deg,var(--green),#2be8a8);color:#07070e;
+  font-size:0.55rem;font-weight:900;letter-spacing:1px;padding:0.15rem 0.5rem;
+  border-radius:4px;display:none;}
+.c-bingo-tag.show{display:block;}
+.c-letters{display:grid;grid-template-columns:repeat(5,1fr);gap:3px;margin-bottom:3px;}
+.c-l{text-align:center;font-family:'Bebas Neue',sans-serif;font-size:0.95rem;letter-spacing:2px;padding:0.3rem;border-radius:6px;}
+.c-l.B{color:var(--B);background:rgba(77,159,255,0.12)}.c-l.I{color:var(--I);background:rgba(247,201,72,0.12)}
+.c-l.N{color:var(--N);background:rgba(255,77,141,0.12)}.c-l.G{color:var(--G);background:rgba(61,255,192,0.12)}
+.c-l.O{color:var(--O);background:rgba(176,109,255,0.12)}
+.c-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:3px;}
+.c-num{aspect-ratio:1;display:flex;align-items:center;justify-content:center;
+  font-family:'Bebas Neue',sans-serif;font-size:0.9rem;
+  border-radius:8px;border:1px solid var(--border);
+  background:rgba(255,255,255,0.02);cursor:pointer;
+  transition:all 0.2s;user-select:none;-webkit-user-select:none;}
+.c-num:active{transform:scale(0.9);}
+.c-num.marked{border-color:transparent;transform:scale(1.04);}
+.c-num.marked.B{background:linear-gradient(135deg,rgba(77,159,255,0.4),rgba(77,159,255,0.15));color:var(--B);box-shadow:0 2px 10px rgba(77,159,255,0.2)}
+.c-num.marked.I{background:linear-gradient(135deg,rgba(247,201,72,0.4),rgba(247,201,72,0.15));color:var(--I);box-shadow:0 2px 10px rgba(247,201,72,0.2)}
+.c-num.marked.N{background:linear-gradient(135deg,rgba(255,77,141,0.4),rgba(255,77,141,0.15));color:var(--N);box-shadow:0 2px 10px rgba(255,77,141,0.2)}
+.c-num.marked.G{background:linear-gradient(135deg,rgba(61,255,192,0.4),rgba(61,255,192,0.15));color:var(--G);box-shadow:0 2px 10px rgba(61,255,192,0.2)}
+.c-num.marked.O{background:linear-gradient(135deg,rgba(176,109,255,0.4),rgba(176,109,255,0.15));color:var(--O);box-shadow:0 2px 10px rgba(176,109,255,0.2)}
+.c-num.pop{animation:cpop 0.35s ease;}
+@keyframes cpop{0%{transform:scale(0.75)}60%{transform:scale(1.15)}100%{transform:scale(1.04)}}
+.c-num.free{background:linear-gradient(135deg,var(--accent),var(--pink));color:#07070e;border-color:transparent;font-size:0.5rem;font-weight:900;letter-spacing:1px;cursor:default;}
+
+/* BINGO BUTTON */
+.bingo-area{text-align:center;margin-bottom:1rem;}
+.btn-bingo{padding:1rem 4rem;border:2px solid rgba(247,201,72,0.15);border-radius:16px;
+  background:linear-gradient(135deg,#1a1a35,#141428);color:var(--muted);
+  font-family:'Bebas Neue',sans-serif;font-size:2rem;letter-spacing:5px;
+  cursor:not-allowed;transition:all 0.3s;}
+.btn-bingo.ready{background:linear-gradient(135deg,var(--pink),var(--accent));
+  border-color:transparent;color:#07070e;cursor:pointer;
+  box-shadow:0 8px 35px rgba(247,201,72,0.3);animation:bready 2s ease-in-out infinite;}
+@keyframes bready{0%,100%{box-shadow:0 8px 35px rgba(247,201,72,0.3)}50%{box-shadow:0 8px 60px rgba(247,201,72,0.5)}}
+.btn-bingo.ready:hover{transform:scale(1.03);filter:brightness(1.08);}
+.bingo-hint{font-size:0.75rem;color:var(--muted);margin-top:0.5rem;}
+
+/* STATS */
+.stats-bar{display:flex;justify-content:center;gap:2rem;margin-bottom:1.5rem;flex-wrap:wrap;}
+.stat-item{text-align:center;}
+.stat-val{font-family:'Bebas Neue',sans-serif;font-size:1.6rem;letter-spacing:2px;color:var(--accent);line-height:1;}
+.stat-lbl{font-size:0.65rem;letter-spacing:1px;text-transform:uppercase;color:var(--muted);}
+
+/* ERRO */
+.erro-box{text-align:center;padding:4rem 2rem;background:var(--card);border:1px solid var(--border);border-radius:20px;}
+.erro-box .e-icon{font-size:3rem;margin-bottom:1rem;}
+.erro-box h3{font-family:'Bebas Neue',sans-serif;font-size:1.5rem;letter-spacing:2px;margin-bottom:0.5rem;}
+.erro-box p{color:var(--muted);font-size:0.9rem;line-height:1.6;}
+
+/* WIN OVERLAY */
+.win-overlay{display:none;position:fixed;inset:0;z-index:200;
+  background:rgba(0,0,0,0.93);backdrop-filter:blur(14px);
+  align-items:center;justify-content:center;text-align:center;}
+.win-overlay.show{display:flex;}
+.win-popup{animation:wpop 0.7s cubic-bezier(0.34,1.56,0.64,1);}
+@keyframes wpop{from{transform:scale(0.3) rotate(-5deg);opacity:0}to{transform:scale(1);opacity:1}}
+.win-word{font-family:'Bebas Neue',sans-serif;font-size:clamp(5rem,18vw,10rem);letter-spacing:6px;line-height:1;
+  background:linear-gradient(135deg,var(--accent),var(--pink),var(--blue),var(--green));
+  background-size:300% 300%;-webkit-background-clip:text;-webkit-text-fill-color:transparent;
+  animation:rainb 3s linear infinite;}
+@keyframes rainb{0%{background-position:0% 50%}50%{background-position:100% 50%}100%{background-position:0% 50%}}
+.win-sub{color:var(--muted);font-size:0.95rem;margin-top:1rem;}
+.win-tipo{font-family:'Bebas Neue',sans-serif;font-size:1.3rem;color:var(--green);letter-spacing:2px;margin-top:0.3rem;}
+.win-msg{color:var(--muted);font-size:0.8rem;margin-top:0.5rem;}
+.win-close{margin-top:2rem;padding:0.8rem 2.5rem;background:linear-gradient(135deg,var(--pink),var(--accent));
+  color:#07070e;border:none;border-radius:12px;font-family:'Bebas Neue',sans-serif;
+  font-size:1.2rem;letter-spacing:2px;cursor:pointer;}
+.cf{position:fixed;pointer-events:none;z-index:201;animation:cffall linear forwards;}
+@keyframes cffall{0%{transform:translateY(-50px) rotate(0deg);opacity:1}100%{transform:translateY(110vh) rotate(720deg);opacity:0}}
+
+@media(max-width:500px){
+  .cartelas-grid.c2,.cartelas-grid.c3,.cartelas-grid.c4,.cartelas-grid.c5p{grid-template-columns:1fr;}
+  .btn-bingo{padding:1rem 2.5rem;font-size:1.6rem;}
+  .ultimo-num{gap:1rem;}
+}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="logo">BingoFest</div>
+  <div class="live-badge"><div class="live-dot"></div>AO VIVO</div>
+  <div class="conn-badge"><div class="conn-dot" id="connDot"></div><span id="connText">Conectando...</span></div>
+</div>
+
+<div class="main">
+  <div class="nome-tag">
+    <h2 id="nomeTitle">Suas Cartelas</h2>
+    <p id="dataSubtitle"></p>
+  </div>
+
+  <!-- ÚLTIMO NÚMERO SORTEADO -->
+  <div class="ultimo-num" id="ultimoNum">
+    <div class="un-label">Último</div>
+    <div class="un-ball" id="unBall">
+      <div class="un-l" id="unL">—</div>
+      <div class="un-n" id="unN">?</div>
+    </div>
+    <div id="unWait" style="color:var(--muted);font-size:0.85rem;">Aguardando sorteio...</div>
+    <div style="display:none" id="unRecentesWrap">
+      <div style="font-size:0.6rem;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin-bottom:0.4rem">Recentes</div>
+      <div class="recentes" id="unRecentes"></div>
+    </div>
+  </div>
+
+  <!-- STATS -->
+  <div class="stats-bar" id="statsBar" style="display:none">
+    <div class="stat-item"><div class="stat-val" id="stChamados">0</div><div class="stat-lbl">Chamados</div></div>
+    <div class="stat-item"><div class="stat-val" id="stMarcados">0</div><div class="stat-lbl">Marcados</div></div>
+    <div class="stat-item"><div class="stat-val" id="stFaltam">—</div><div class="stat-lbl">Faltam</div></div>
+  </div>
+
+  <!-- INSTRUÇÃO -->
+  <div class="instrucao">👆 Toque nos números para marcar • O botão BINGO ativa sozinho quando completar</div>
+
+  <!-- CARTELAS -->
+  <div id="cartelasContainer"></div>
+
+  <!-- BINGO -->
+  <div class="bingo-area" id="bingoArea" style="display:none">
+    <button class="btn-bingo" id="btnBingo" disabled>🎉 BINGO!</button>
+    <div class="bingo-hint" id="bingoHint">Complete uma linha, coluna ou diagonal para ativar</div>
+  </div>
+</div>
+
+<!-- WIN OVERLAY -->
+<div class="win-overlay" id="winOverlay">
+  <div class="win-popup">
+    <div class="win-word">BINGO!</div>
+    <div class="win-sub">Você completou!</div>
+    <div class="win-tipo" id="winTipo"></div>
+    <div class="win-msg">Aguarde o apresentador confirmar! 🎉</div>
+    <button class="win-close" onclick="document.getElementById('winOverlay').classList.remove('show')">FECHAR</button>
+  </div>
+</div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
+
+// ── Firebase ──
+const firebaseConfig = {
+  apiKey: "AIzaSyCtrgYYf2eBtGV6h2EQz99QUeIOZH3SKTY",
+  authDomain: "bingo-9737e.firebaseapp.com",
+  databaseURL: "https://bingo-9737e-default-rtdb.firebaseio.com",
+  projectId: "bingo-9737e",
+  storageBucket: "bingo-9737e.firebasestorage.app",
+  messagingSenderId: "74980412774",
+  appId: "1:74980412774:web:1eee26dd7849ea07ab0ca7"
+};
+const fbApp = initializeApp(firebaseConfig);
+const db = getDatabase(fbApp);
+const sorteioRef = ref(db, 'sorteio');
+
+// ── Constantes ──
+const COLS = ['B','I','N','G','O'];
+const RANGES = {B:[1,15],I:[16,30],N:[31,45],G:[46,60],O:[61,75]};
+const SECRET = 'bingofest2025';
+function colOf(n){for(const c of COLS){const[a,b]=RANGES[c];if(n>=a&&n<=b)return c;}return'B';}
+
+// ── Segurança: decodificar cartela ──
+function hashStr(str){let h=0;for(let i=0;i<str.length;i++)h=(Math.imul(31,h)+str.charCodeAt(i))|0;return Math.abs(h).toString(36);}
+function decodeCartela(encoded,nome,idx){
+  try{
+    let b64=encoded.replace(/-/g,'+').replace(/_/g,'/');
+    while(b64.length%4)b64+='=';
+    const decoded=atob(b64);
+    const sep=decoded.lastIndexOf('|');
+    if(sep===-1)return null;
+    const payload=decoded.slice(0,sep);
+    const sig=decoded.slice(sep+1);
+    if(sig!==hashStr(SECRET+nome+idx+payload))return null;
+    const nums=payload.split(',').map(Number);
+    if(nums.length!==25||nums.some(isNaN))return null;
+    const card=[];
+    for(let ci=0;ci<5;ci++)card.push(nums.slice(ci*5,ci*5+5));
+    return card;
+  }catch(e){return null;}
+}
+
+// ── Parse URL ──
+const params = new URLSearchParams(window.location.search);
+const nome = params.get('nome') || 'Jogador';
+const qtd = parseInt(params.get('qtd')) || 0;
+const data = params.get('data') || '';
+let temErro = false;
+const cards = [];
+for(let i=1;i<=qtd;i++){
+  const raw=params.get('c'+i);
+  if(!raw){temErro=true;continue;}
+  const card=decodeCartela(raw,nome,i);
+  if(!card){temErro=true;continue;}
+  cards.push(card);
+}
+
+// ── Renderizar erro se link inválido ──
+if((temErro && cards.length===0 && qtd>0) || qtd===0){
+  document.getElementById('cartelasContainer').innerHTML=`
+    <div class="erro-box">
+      <div class="e-icon">🚫</div>
+      <h3>${qtd===0?'Sem Cartelas':'Link Inválido'}</h3>
+      <p>${qtd===0?'Acesse o link enviado pelo apresentador via WhatsApp.':'Este link foi alterado ou está corrompido.<br>Peça um novo link para o apresentador.'}</p>
+    </div>`;
+  document.getElementById('ultimoNum').style.display='none';
+  document.getElementById('bingoArea').style.display='none';
+} else {
+  iniciar();
+}
+
+function iniciar(){
+  // Nome e data
+  document.getElementById('nomeTitle').textContent = '🎴 '+nome;
+  if(data) document.getElementById('dataSubtitle').textContent = 'Sorteio: '+data;
+  document.getElementById('statsBar').style.display='flex';
+  document.getElementById('bingoArea').style.display='block';
+
+  // Estado das cartelas
+  const jogCartelas = cards.map(card=>({card, marked:new Set(['FREE'])}));
+  let bingoTriggered = false;
+  let ultimoDrawn = [];
+
+  // Renderizar cartelas
+  renderCartelas();
+
+  // ── Firebase listener — números em tempo real ──
+  onValue(sorteioRef, snap => {
+    document.getElementById('connDot').className = 'conn-dot ok';
+    document.getElementById('connText').textContent = 'Ao vivo';
+    if(!snap.exists()) return;
+    const fbData = snap.val();
+    const drawn = fbData.drawn || [];
+
+    // Encontrar números novos
+    const novos = drawn.slice(ultimoDrawn.length);
+    ultimoDrawn = drawn;
+
+    // Atualizar último número
+    if(drawn.length > 0){
+      const last = drawn[drawn.length-1];
+      atualizarUltimo(last, drawn);
+      // Marcar novos nas cartelas
+      novos.forEach(({n,col})=>marcarNasCartelas(n,col));
+    }
+
+    // Atualizar stats
+    document.getElementById('stChamados').textContent = drawn.length;
+    atualizarStats();
+  }, err => {
+    document.getElementById('connDot').className = 'conn-dot err';
+    document.getElementById('connText').textContent = 'Sem conexão';
+  });
+
+  function atualizarUltimo({n,col}, drawn){
+    const ball=document.getElementById('unBall');
+    ball.className='un-ball '+col+' pop';
+    setTimeout(()=>ball.classList.remove('pop'),600);
+    document.getElementById('unL').textContent=col;
+    document.getElementById('unN').textContent=n;
+    document.getElementById('unWait').style.display='none';
+    document.getElementById('unRecentesWrap').style.display='block';
+    // Recentes
+    const rec=document.getElementById('unRecentes');
+    rec.innerHTML='';
+    drawn.slice(-8).reverse().forEach(({n:rn,col:rc})=>{
+      const s=document.createElement('span');
+      s.className='rec-item '+rc;s.textContent=rc+rn;rec.appendChild(s);
+    });
+  }
+
+  function marcarNasCartelas(n,col){
+    jogCartelas.forEach((jc,cidx)=>{
+      // Checar se tem o número
+      let temNum=false;
+      for(let ci=0;ci<5;ci++) for(let row=0;row<5;row++) if(jc.card[ci][row]===n) temNum=true;
+      if(!temNum) return;
+      // Marcar
+      jc.marked.add(n);
+      const cell=document.getElementById(`pc-${cidx}-${n}`);
+      if(cell){
+        cell.classList.add('marked',col,'pop');
+        setTimeout(()=>cell.classList.remove('pop'),400);
+      }
+    });
+    if(!bingoTriggered) checarBingo();
+    atualizarStats();
+  }
+
+  function atualizarStats(){
+    let totalMarcados=0;
+    jogCartelas.forEach(jc=>totalMarcados+=jc.marked.size-1); // -1 FREE
+    const media=Math.round(totalMarcados/jogCartelas.length);
+    document.getElementById('stMarcados').textContent=media;
+    document.getElementById('stFaltam').textContent=Math.max(0,24-media);
+  }
+
+  function checarBingo(){
+    let anyBingo=false;let bingoInfo='';
+    jogCartelas.forEach((jc,idx)=>{
+      const r=verificarBingo(jc.card,jc.marked);
+      if(r.win){
+        anyBingo=true;
+        bingoInfo=`Cartela ${idx+1} — ${r.tipo}`;
+        const tag=document.getElementById('cbt-'+idx);
+        const wrap=document.getElementById('cw-'+idx);
+        if(tag) tag.classList.add('show');
+        if(wrap) wrap.classList.add('bingo-hit');
+      }
+    });
+    const btn=document.getElementById('btnBingo');
+    if(anyBingo){
+      btn.className='btn-bingo ready';btn.disabled=false;
+      btn.dataset.info=bingoInfo;
+      document.getElementById('bingoHint').textContent='🎉 BINGO! Clique para avisar o apresentador!';
+    }
+  }
+
+  function verificarBingo(card,marked){
+    for(let row=0;row<5;row++){let w=true;for(let ci=0;ci<5;ci++){if(row===2&&ci===2)continue;if(!marked.has(card[ci][row])){w=false;break;}}if(w)return{win:true,tipo:'Linha '+(row+1)};}
+    for(let ci=0;ci<5;ci++){let w=true;for(let row=0;row<5;row++){if(row===2&&ci===2)continue;if(!marked.has(card[ci][row])){w=false;break;}}if(w)return{win:true,tipo:'Coluna '+COLS[ci]};}
+    let d1=true;for(let i=0;i<5;i++){if(i===2)continue;if(!marked.has(card[i][i])){d1=false;break;}}if(d1)return{win:true,tipo:'Diagonal ↘'};
+    let d2=true;for(let i=0;i<5;i++){if(i===2)continue;if(!marked.has(card[i][4-i])){d2=false;break;}}if(d2)return{win:true,tipo:'Diagonal ↙'};
+    return{win:false};
+  }
+
+  document.getElementById('btnBingo').onclick=function(){
+    if(bingoTriggered) return;
+    bingoTriggered=true;
+    const info=this.dataset.info||'Bingo!';
+    this.className='btn-bingo';this.disabled=true;
+    document.getElementById('bingoHint').textContent='✅ Aguarde o apresentador confirmar!';
+    document.getElementById('winTipo').textContent=info;
+    spawnConfetti();
+    setTimeout(()=>document.getElementById('winOverlay').classList.add('show'),500);
+  };
+
+  function renderCartelas(){
+    const container=document.getElementById('cartelasContainer');
+    const grid=document.createElement('div');
+    grid.className='cartelas-grid';
+    const n=jogCartelas.length;
+    if(n===1)grid.classList.add('c1');
+    else if(n===2)grid.classList.add('c2');
+    else if(n<=4)grid.classList.add('c3');
+    else grid.classList.add('c5p');
+    jogCartelas.forEach((jc,idx)=>grid.appendChild(buildCartela(jc,idx)));
+    container.appendChild(grid);
+  }
+
+  function buildCartela(jc,idx){
+    const wrap=document.createElement('div');
+    wrap.className='cartela-wrap';wrap.id='cw-'+idx;
+    const hdr=document.createElement('div');hdr.className='c-id';
+    hdr.innerHTML=`<span>Cartela #${String(idx+1).padStart(3,'0')}</span><span class="c-bingo-tag" id="cbt-${idx}">BINGO!</span>`;
+    wrap.appendChild(hdr);
+    const lets=document.createElement('div');lets.className='c-letters';
+    COLS.forEach(c=>{const d=document.createElement('div');d.className='c-l '+c;d.textContent=c;lets.appendChild(d);});
+    wrap.appendChild(lets);
+    const grd=document.createElement('div');grd.className='c-grid';
+    for(let row=0;row<5;row++)for(let ci=0;ci<5;ci++){
+      const cell=document.createElement('div');
+      if(row===2&&ci===2){
+        cell.className='c-num free marked G';cell.textContent='FREE';
+      } else {
+        const n=jc.card[ci][row];const col=colOf(n);
+        cell.className='c-num'+(jc.marked.has(n)?' marked '+col:'');
+        cell.textContent=n;cell.id=`pc-${idx}-${n}`;
+        cell.dataset.col=col;
+        // Marcação manual por toque
+        cell.onclick=()=>{
+          if(jc.marked.has(n)){
+            jc.marked.delete(n);
+            cell.className='c-num';
+          } else {
+            jc.marked.add(n);
+            cell.className='c-num marked '+col+' pop';
+            setTimeout(()=>cell.classList.remove('pop'),400);
+          }
+          atualizarStats();
+          if(!bingoTriggered) checarBingo();
+        };
+      }
+      grd.appendChild(cell);
+    }
+    wrap.appendChild(grd);return wrap;
+  }
+}
+
+function spawnConfetti(){
+  const colors=['#f7c948','#ff4d8d','#4d9fff','#3dffc0','#b06dff','#fff'];
+  for(let i=0;i<90;i++){
+    const el=document.createElement('div');el.className='cf';
+    el.style.cssText=`left:${Math.random()*100}vw;top:-30px;background:${colors[Math.floor(Math.random()*colors.length)]};border-radius:${Math.random()>.5?'50%':'2px'};width:${Math.random()*10+5}px;height:${Math.random()*10+5}px;animation-duration:${Math.random()*2+1.5}s;animation-delay:${Math.random()*0.5}s;`;
+    document.body.appendChild(el);setTimeout(()=>el.remove(),4000);
+  }
+}
+</script>
+</body>
+</html>
