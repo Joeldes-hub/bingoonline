@@ -1,0 +1,506 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BingoFest — Admin</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Nunito:wght@400;600;700;900&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#07070e;--card:#0f0f1e;--card2:#141428;--accent:#f7c948;--pink:#ff4d8d;--blue:#4d9fff;--green:#3dffc0;--purple:#b06dff;--red:#ff5252;--text:#f0eeff;--muted:#6666aa;--border:rgba(255,255,255,0.07);--B:#4d9fff;--I:#f7c948;--N:#ff4d8d;--G:#3dffc0;--O:#b06dff;}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{background:var(--bg);color:var(--text);font-family:'Nunito',sans-serif;min-height:100vh;}
+body::before{content:'';position:fixed;inset:0;pointer-events:none;background:radial-gradient(ellipse 60% 40% at 10% 10%,rgba(255,77,141,0.07) 0%,transparent 60%),radial-gradient(ellipse 50% 50% at 90% 90%,rgba(77,159,255,0.06) 0%,transparent 60%);}
+#loginScreen{position:fixed;inset:0;z-index:999;background:var(--bg);display:flex;align-items:center;justify-content:center;}
+.login-box{background:var(--card);border:1px solid var(--border);border-radius:24px;padding:2.5rem 2rem;width:100%;max-width:380px;box-shadow:0 30px 80px rgba(0,0,0,0.5);}
+.login-logo{font-family:'Bebas Neue',sans-serif;font-size:2.5rem;letter-spacing:4px;background:linear-gradient(135deg,var(--accent),var(--pink));-webkit-background-clip:text;-webkit-text-fill-color:transparent;text-align:center;margin-bottom:0.3rem;}
+.login-sub{text-align:center;color:var(--muted);font-size:0.8rem;margin-bottom:2rem;letter-spacing:1px;}
+.login-field{display:flex;flex-direction:column;gap:0.5rem;margin-bottom:1.2rem;}
+.login-field label{font-size:0.7rem;letter-spacing:2px;text-transform:uppercase;color:var(--muted);font-weight:700;}
+.login-field input{background:rgba(255,255,255,0.04);border:1px solid var(--border);border-radius:10px;padding:0.8rem 1rem;color:var(--text);font-family:'Nunito',sans-serif;font-size:1rem;font-weight:600;outline:none;transition:border-color 0.2s;}
+.login-field input:focus{border-color:rgba(247,201,72,0.4);}
+.btn-login{width:100%;padding:0.9rem;background:linear-gradient(135deg,var(--pink),var(--accent));color:#07070e;border:none;border-radius:12px;font-family:'Bebas Neue',sans-serif;font-size:1.4rem;letter-spacing:3px;cursor:pointer;transition:all 0.2s;}
+.btn-login:hover{filter:brightness(1.1);}
+.login-erro{display:none;text-align:center;color:var(--red);font-size:0.8rem;font-weight:700;margin-top:0.8rem;background:rgba(255,82,82,0.08);border:1px solid rgba(255,82,82,0.2);border-radius:8px;padding:0.5rem;}
+.login-erro.show{display:block;}
+.nav{position:sticky;top:0;z-index:50;background:rgba(7,7,14,0.97);border-bottom:1px solid var(--border);padding:0 1.5rem;display:flex;align-items:center;backdrop-filter:blur(12px);}
+.logo{font-family:'Bebas Neue',sans-serif;font-size:1.5rem;letter-spacing:3px;background:linear-gradient(135deg,var(--accent),var(--pink));-webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-right:1.5rem;padding:1rem 0;white-space:nowrap;flex-shrink:0;}
+.nav-badge{background:rgba(255,77,141,0.1);border:1px solid rgba(255,77,141,0.2);color:var(--pink);font-size:0.65rem;font-weight:700;letter-spacing:1px;padding:0.2rem 0.6rem;border-radius:4px;margin-right:1.5rem;text-transform:uppercase;}
+.tab-btn{padding:1rem 1rem;background:none;border:none;color:var(--muted);font-family:'Nunito',sans-serif;font-weight:700;font-size:0.78rem;letter-spacing:1px;text-transform:uppercase;cursor:pointer;border-bottom:2px solid transparent;transition:all 0.2s;white-space:nowrap;}
+.tab-btn.active{color:var(--accent);border-bottom-color:var(--accent);}
+.tab-btn:hover:not(.active){color:var(--text);}
+.nav-right{margin-left:auto;display:flex;align-items:center;gap:1rem;}
+.fb-status{display:flex;align-items:center;gap:0.4rem;font-size:0.72rem;color:var(--muted);}
+.fb-dot{width:7px;height:7px;border-radius:50%;background:var(--muted);}
+.fb-dot.ok{background:var(--green);animation:pulse 1.5s ease-in-out infinite;}
+.fb-dot.err{background:var(--red);}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.4}}
+.btn-logout{background:none;border:1px solid var(--border);color:var(--muted);padding:0.4rem 0.8rem;border-radius:8px;font-size:0.75rem;font-weight:700;cursor:pointer;transition:all 0.2s;}
+.btn-logout:hover{color:var(--red);border-color:rgba(255,82,82,0.3);}
+.view{display:none;}.view.active{display:block;}
+.page{max-width:1100px;margin:0 auto;padding:2rem;position:relative;z-index:1;}
+.page-header{margin-bottom:2rem;}
+.page-header h1{font-family:'Bebas Neue',sans-serif;font-size:2rem;letter-spacing:3px;}
+.page-header p{color:var(--muted);font-size:0.85rem;margin-top:0.2rem;}
+.card{background:var(--card);border:1px solid var(--border);border-radius:20px;padding:1.5rem;}
+.card-title{font-family:'Bebas Neue',sans-serif;font-size:1.2rem;letter-spacing:2px;margin-bottom:1.2rem;}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:1rem;}
+.form-row.c3{grid-template-columns:1fr 1fr 1fr;}
+.form-group{display:flex;flex-direction:column;gap:0.4rem;}
+.form-group label{font-size:0.7rem;letter-spacing:2px;text-transform:uppercase;color:var(--muted);font-weight:700;}
+.form-group input,.form-group select{background:rgba(255,255,255,0.04);border:1px solid var(--border);border-radius:10px;padding:0.7rem 1rem;color:var(--text);font-family:'Nunito',sans-serif;font-size:0.9rem;font-weight:600;outline:none;transition:border-color 0.2s;}
+.form-group input:focus,.form-group select:focus{border-color:rgba(247,201,72,0.4);}
+.form-group select option{background:#0f0f1e;}
+.btn-primary{background:linear-gradient(135deg,var(--pink),var(--accent));color:#07070e;border:none;border-radius:10px;padding:0.75rem 1.5rem;font-family:'Bebas Neue',sans-serif;font-size:1.1rem;letter-spacing:2px;cursor:pointer;transition:all 0.2s;}
+.btn-primary:hover{filter:brightness(1.1);transform:scale(1.02);}
+.btn-secondary{background:rgba(255,255,255,0.05);border:1px solid var(--border);color:var(--muted);padding:0.65rem 1.2rem;border-radius:10px;font-family:'Nunito',sans-serif;font-weight:700;font-size:0.85rem;cursor:pointer;transition:all 0.2s;}
+.btn-secondary:hover{color:var(--text);}
+.btn-danger{background:none;border:1px solid rgba(255,82,82,0.3);color:var(--red);padding:0.5rem 0.9rem;border-radius:8px;font-family:'Nunito',sans-serif;font-weight:700;font-size:0.78rem;cursor:pointer;transition:all 0.2s;}
+.btn-danger:hover{background:rgba(255,82,82,0.1);}
+.btn-green{background:rgba(61,255,192,0.1);border:1px solid rgba(61,255,192,0.3);color:var(--green);padding:0.5rem 0.9rem;border-radius:8px;font-family:'Nunito',sans-serif;font-weight:700;font-size:0.78rem;cursor:pointer;transition:all 0.2s;}
+.btn-green:hover{background:rgba(61,255,192,0.2);}
+.btn-wpp{background:rgba(37,211,102,0.1);border:1px solid rgba(37,211,102,0.3);color:#25d366;padding:0.5rem 0.9rem;border-radius:8px;font-family:'Nunito',sans-serif;font-weight:700;font-size:0.78rem;cursor:pointer;transition:all 0.2s;text-decoration:none;display:inline-flex;align-items:center;gap:0.4rem;}
+.btn-wpp:hover{background:rgba(37,211,102,0.2);}
+.badge{display:inline-flex;align-items:center;gap:0.3rem;font-size:0.7rem;font-weight:700;letter-spacing:1px;padding:0.25rem 0.6rem;border-radius:20px;text-transform:uppercase;}
+.badge-green{background:rgba(61,255,192,0.1);color:var(--green);border:1px solid rgba(61,255,192,0.2);}
+.badge-yellow{background:rgba(247,201,72,0.1);color:var(--accent);border:1px solid rgba(247,201,72,0.2);}
+.badge-red{background:rgba(255,82,82,0.1);color:var(--red);border:1px solid rgba(255,82,82,0.2);}
+.badge-blue{background:rgba(77,159,255,0.1);color:var(--blue);border:1px solid rgba(77,159,255,0.2);}
+.empty-state{text-align:center;padding:3rem;color:var(--muted);}
+.empty-state .ei{font-size:2.5rem;margin-bottom:0.8rem;}
+.empty-state h3{font-family:'Bebas Neue',sans-serif;font-size:1.3rem;letter-spacing:2px;margin-bottom:0.4rem;color:var(--text);}
+.toast{position:fixed;bottom:2rem;right:2rem;z-index:500;background:var(--card2);border:1px solid var(--border);border-radius:12px;padding:0.8rem 1.2rem;font-size:0.85rem;font-weight:700;display:none;align-items:center;gap:0.5rem;box-shadow:0 10px 30px rgba(0,0,0,0.4);}
+.toast.show{display:flex;}
+/* SORTEIOS */
+.sorteios-grid{display:grid;gap:1rem;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));margin-top:1.5rem;}
+.sorteio-card{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:1.2rem;position:relative;overflow:hidden;transition:all 0.2s;}
+.sorteio-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;}
+.sorteio-card.ativo::before{background:linear-gradient(90deg,var(--green),var(--blue));}
+.sorteio-card.aguardando::before{background:linear-gradient(90deg,var(--accent),var(--pink));}
+.sorteio-card.encerrado::before{background:var(--muted);}
+.sorteio-card:hover{transform:translateY(-3px);box-shadow:0 10px 30px rgba(0,0,0,0.3);}
+.sc-nome{font-family:'Bebas Neue',sans-serif;font-size:1.2rem;letter-spacing:2px;margin-bottom:0.2rem;}
+.sc-produto{color:var(--accent);font-size:0.8rem;font-weight:700;margin-bottom:0.5rem;}
+.sc-info{color:var(--muted);font-size:0.78rem;margin-bottom:1rem;line-height:1.5;}
+.sc-stats{display:flex;gap:1rem;margin-bottom:1rem;}
+.sc-stat{text-align:center;}
+.sc-stat-val{font-family:'Bebas Neue',sans-serif;font-size:1.3rem;color:var(--accent);letter-spacing:1px;}
+.sc-stat-lbl{font-size:0.6rem;letter-spacing:1px;text-transform:uppercase;color:var(--muted);}
+.sc-actions{display:flex;gap:0.5rem;flex-wrap:wrap;}
+/* VENDAS */
+.vendas-filter{display:flex;gap:1rem;margin-bottom:1.5rem;flex-wrap:wrap;align-items:center;}
+.vendas-summary{display:flex;gap:1.5rem;margin-bottom:1.5rem;flex-wrap:wrap;}
+.vs-item{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:0.8rem 1.2rem;text-align:center;}
+.vs-val{font-family:'Bebas Neue',sans-serif;font-size:1.6rem;color:var(--accent);letter-spacing:2px;}
+.vs-lbl{font-size:0.65rem;letter-spacing:1px;text-transform:uppercase;color:var(--muted);}
+.vendas-table{width:100%;border-collapse:collapse;}
+.vendas-table th{font-size:0.65rem;letter-spacing:2px;text-transform:uppercase;color:var(--muted);font-weight:700;padding:0.6rem 0.8rem;text-align:left;border-bottom:1px solid var(--border);}
+.vendas-table td{padding:0.7rem 0.8rem;font-size:0.85rem;border-bottom:1px solid rgba(255,255,255,0.03);vertical-align:middle;}
+.vendas-table tr:hover td{background:rgba(255,255,255,0.02);}
+.cartela-chips{display:flex;gap:4px;flex-wrap:wrap;}
+.chip{background:rgba(247,201,72,0.08);border:1px solid rgba(247,201,72,0.2);color:var(--accent);font-family:'Bebas Neue',sans-serif;font-size:0.75rem;letter-spacing:1px;padding:0.15rem 0.5rem;border-radius:4px;cursor:pointer;transition:all 0.2s;user-select:none;}
+.chip:hover{background:rgba(255,82,82,0.15);border-color:rgba(255,82,82,0.4);color:var(--red);}
+.chip-hint{font-size:0.65rem;color:var(--muted);margin-top:0.3rem;}
+/* MODAL */
+.modal-overlay{display:none;position:fixed;inset:0;z-index:200;background:rgba(0,0,0,0.85);backdrop-filter:blur(8px);align-items:center;justify-content:center;}
+.modal-overlay.show{display:flex;}
+.modal-box{background:var(--card);border:1px solid var(--border);border-radius:20px;padding:2rem;max-width:500px;width:90%;animation:modalIn 0.3s ease;}
+@keyframes modalIn{from{transform:scale(0.9);opacity:0}to{transform:scale(1);opacity:1}}
+.modal-title{font-family:'Bebas Neue',sans-serif;font-size:1.4rem;letter-spacing:2px;margin-bottom:0.3rem;}
+.modal-sub{color:var(--muted);font-size:0.82rem;margin-bottom:1.5rem;line-height:1.5;}
+.modal-chips{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:1.5rem;}
+.modal-chip{background:rgba(255,255,255,0.04);border:1px solid var(--border);color:var(--muted);font-family:'Bebas Neue',sans-serif;font-size:0.95rem;letter-spacing:1px;padding:0.5rem 0.8rem;border-radius:8px;cursor:pointer;transition:all 0.2s;user-select:none;}
+.modal-chip:hover{border-color:rgba(255,82,82,0.4);color:var(--red);}
+.modal-chip.sel{background:rgba(255,82,82,0.15);border-color:rgba(255,82,82,0.5);color:var(--red);}
+.modal-chip.all-btn{background:rgba(255,82,82,0.06);border-color:rgba(255,82,82,0.25);color:var(--red);font-size:0.7rem;letter-spacing:1px;}
+.modal-chip.all-btn.sel{background:rgba(255,82,82,0.2);}
+.modal-actions{display:flex;gap:0.8rem;justify-content:flex-end;flex-wrap:wrap;}
+/* GERADOR */
+.gen-sorteio-sel{background:rgba(255,255,255,0.04);border:1px solid var(--border);border-radius:12px;padding:1rem 1.2rem;margin-bottom:1.5rem;display:flex;align-items:center;gap:1rem;flex-wrap:wrap;}
+.gss-label{font-size:0.7rem;letter-spacing:2px;text-transform:uppercase;color:var(--muted);font-weight:700;white-space:nowrap;}
+.gss-sel{flex:1;background:rgba(255,255,255,0.04);border:1px solid rgba(247,201,72,0.3);border-radius:8px;padding:0.6rem 1rem;color:var(--text);font-family:'Nunito',sans-serif;font-size:0.9rem;font-weight:700;outline:none;min-width:200px;}
+.link-box{background:rgba(255,255,255,0.03);border:1px solid var(--border);border-radius:10px;padding:0.8rem 1rem;font-size:0.78rem;color:var(--muted);word-break:break-all;margin-bottom:1rem;line-height:1.6;}
+.link-box span{color:var(--accent);font-weight:700;}
+.cpg{background:var(--card2);border:1px solid var(--border);border-radius:12px;padding:0.8rem;}
+.cpg-id{font-size:0.6rem;letter-spacing:2px;color:var(--muted);margin-bottom:0.5rem;text-transform:uppercase;}
+.cpg-letters,.cpg-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:2px;}
+.cpg-letters{margin-bottom:2px;}
+.cpg-l{text-align:center;font-family:'Bebas Neue',sans-serif;font-size:0.8rem;letter-spacing:2px;padding:0.25rem;border-radius:4px;}
+.cpg-l.B{color:var(--B);background:rgba(77,159,255,0.1)}.cpg-l.I{color:var(--I);background:rgba(247,201,72,0.1)}
+.cpg-l.N{color:var(--N);background:rgba(255,77,141,0.1)}.cpg-l.G{color:var(--G);background:rgba(61,255,192,0.1)}
+.cpg-l.O{color:var(--O);background:rgba(176,109,255,0.1)}
+.cpg-num{aspect-ratio:1;display:flex;align-items:center;justify-content:center;font-family:'Bebas Neue',sans-serif;font-size:0.72rem;border-radius:4px;border:1px solid var(--border);background:rgba(255,255,255,0.02);color:var(--muted);}
+.cpg-num.free{background:linear-gradient(135deg,var(--accent),var(--pink));color:#07070e;border-color:transparent;font-size:0.45rem;font-weight:900;}
+.cartelas-preview{display:grid;gap:1rem;}
+.resultado-box{background:var(--card2);border:1px solid rgba(61,255,192,0.2);border-radius:16px;padding:1.5rem;margin-top:1.5rem;display:none;}
+.resultado-box.show{display:block;}
+.rb-actions{display:flex;gap:0.8rem;flex-wrap:wrap;margin-bottom:1rem;}
+@media(max-width:768px){.form-row,.form-row.c3{grid-template-columns:1fr;}.tab-btn{padding:0.8rem 0.5rem;font-size:0.68rem;}.logo{font-size:1.2rem;margin-right:0.5rem;}.nav-badge{display:none;}}
+</style>
+</head>
+<body>
+
+<div id="loginScreen">
+  <div class="login-box">
+    <div style="text-align:center;font-size:2rem;margin-bottom:0.5rem">🔐</div>
+    <div class="login-logo">BingoFest</div>
+    <div class="login-sub">Painel Administrativo</div>
+    <div class="login-field"><label>Usuário</label><input type="text" id="lUser" placeholder="Usuário" autocomplete="username"></div>
+    <div class="login-field"><label>Senha</label><input type="password" id="lPass" placeholder="Senha" autocomplete="current-password"></div>
+    <button class="btn-login" onclick="fazerLogin()">ENTRAR</button>
+    <div class="login-erro" id="lErro">❌ Usuário ou senha incorretos</div>
+  </div>
+</div>
+
+<div class="nav">
+  <div class="logo">BingoFest</div>
+  <div class="nav-badge">ADMIN</div>
+  <button class="tab-btn active" onclick="switchTab('sorteios',this)">🏆 Sorteios</button>
+  <button class="tab-btn" onclick="switchTab('gerador',this)">🎴 Gerar Cartelas</button>
+  <button class="tab-btn" onclick="switchTab('vendas',this)">📋 Controle de Vendas</button>
+  <div class="nav-right">
+    <div class="fb-status"><div class="fb-dot" id="fbDot"></div><span id="fbStatus">Conectando...</span></div>
+    <button class="btn-logout" onclick="fazerLogout()">Sair</button>
+  </div>
+</div>
+
+<!-- SORTEIOS -->
+<div class="view active" id="view-sorteios"><div class="page">
+  <div class="page-header"><h1>Gerenciar Sorteios</h1><p>Crie e gerencie seus sorteios. Cada sorteio tem suas próprias cartelas.</p></div>
+  <div class="card" style="margin-bottom:2rem">
+    <div class="card-title">➕ Novo Sorteio</div>
+    <div class="form-row c3">
+      <div class="form-group"><label>Nome do Sorteio</label><input type="text" id="sNome" placeholder="Ex: Sorteio de Maio"></div>
+      <div class="form-group"><label>Produto / Prêmio</label><input type="text" id="sProduto" placeholder="Ex: Smart TV 50 Polegadas"></div>
+      <div class="form-group"><label>Data e Hora</label><input type="text" id="sData" placeholder="Ex: 10/05 às 20h"></div>
+    </div>
+    <button class="btn-primary" onclick="criarSorteio()">🏆 CRIAR SORTEIO</button>
+  </div>
+  <div style="font-family:'Bebas Neue',sans-serif;font-size:1.1rem;letter-spacing:2px;color:var(--muted);margin-bottom:1rem">Sorteios Cadastrados</div>
+  <div class="sorteios-grid" id="sorteiosGrid"><div class="empty-state"><div class="ei">🏆</div><h3>Nenhum sorteio</h3><p>Crie seu primeiro sorteio acima</p></div></div>
+</div></div>
+
+<!-- GERADOR -->
+<div class="view" id="view-gerador"><div class="page">
+  <div class="page-header"><h1>Gerar Cartelas</h1><p>Selecione o sorteio primeiro, depois gere as cartelas para o jogador</p></div>
+  <div class="card" style="margin-bottom:1.5rem">
+    <div class="card-title">1️⃣ Selecione o Sorteio</div>
+    <div class="gen-sorteio-sel">
+      <div class="gss-label">Sorteio:</div>
+      <select class="gss-sel" id="genSorteioSel"><option value="">— Selecione um sorteio —</option></select>
+      <div id="genSorteioInfo" style="font-size:0.8rem;color:var(--muted)"></div>
+    </div>
+    <div class="card-title">2️⃣ Dados do Jogador</div>
+    <div class="form-row c3">
+      <div class="form-group"><label>Nome do Jogador</label><input type="text" id="genNome" placeholder="Ex: João Silva"></div>
+      <div class="form-group"><label>WhatsApp (com DDD)</label><input type="text" id="genWpp" placeholder="Ex: 11999999999"></div>
+      <div class="form-group"><label>Quantidade de Cartelas</label>
+        <select id="genQtd"><option value="1">1 cartela</option><option value="2">2 cartelas</option><option value="3">3 cartelas</option><option value="4">4 cartelas</option><option value="5">5 cartelas</option><option value="10">10 cartelas</option><option value="15">15 cartelas</option></select>
+      </div>
+    </div>
+    <button class="btn-primary" onclick="gerarCartelas()">🎴 GERAR CARTELAS</button>
+  </div>
+  <div class="resultado-box" id="resultadoBox">
+    <div style="font-family:'Bebas Neue',sans-serif;font-size:1.3rem;letter-spacing:2px;margin-bottom:0.2rem" id="rbTitle"></div>
+    <div style="color:var(--muted);font-size:0.78rem;margin-bottom:1rem" id="rbSubtitle"></div>
+    <div class="rb-actions">
+      <button class="btn-green" onclick="copiarLink()">📋 Copiar Link</button>
+      <a class="btn-wpp" id="btnWpp" href="#" target="_blank">📲 Enviar WhatsApp</a>
+      <button class="btn-secondary" onclick="novaGeracao()">↺ Gerar Novo</button>
+    </div>
+    <div class="link-box" id="linkBox"></div>
+    <div class="cartelas-preview" id="cartelasPreview"></div>
+  </div>
+</div></div>
+
+<!-- VENDAS -->
+<div class="view" id="view-vendas"><div class="page">
+  <div class="page-header"><h1>Controle de Vendas</h1><p>Clique em uma cartela para excluí-la individualmente, ou use o botão 🗑 para excluir todas do jogador.</p></div>
+  <div class="vendas-filter">
+    <div class="gss-label" style="font-size:0.7rem;letter-spacing:2px;text-transform:uppercase;color:var(--muted);font-weight:700">Filtrar:</div>
+    <select id="vendasFiltro" onchange="filtrarVendas()" style="background:rgba(255,255,255,0.04);border:1px solid var(--border);border-radius:10px;padding:0.6rem 1rem;color:var(--text);font-family:'Nunito',sans-serif;font-size:0.85rem;font-weight:600;outline:none;"><option value="todos">Todos os sorteios</option></select>
+    <button class="btn-danger" onclick="exportarCSV()">📥 Exportar CSV</button>
+  </div>
+  <div class="vendas-summary" id="vendasSummary"></div>
+  <div class="card"><div id="vendasContainer"><div class="empty-state"><div class="ei">📋</div><h3>Nenhuma venda</h3><p>As vendas aparecerão aqui após gerar cartelas</p></div></div></div>
+</div></div>
+
+<!-- MODAL -->
+<div class="modal-overlay" id="modalExcluir">
+  <div class="modal-box">
+    <div class="modal-title">🗑 Excluir Cartelas</div>
+    <div class="modal-sub" id="modalSub"></div>
+    <div class="modal-chips" id="modalChips"></div>
+    <div class="modal-actions">
+      <button class="btn-secondary" onclick="fecharModal()">Cancelar</button>
+      <button class="btn-danger" onclick="confirmarExclusao()">🗑 Excluir Selecionadas</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import { getDatabase, ref, set, onValue, remove, update } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
+
+const firebaseConfig={apiKey:"AIzaSyCtrgYYf2eBtGV6h2EQz99QUeIOZH3SKTY",authDomain:"bingo-9737e.firebaseapp.com",databaseURL:"https://bingo-9737e-default-rtdb.firebaseio.com",projectId:"bingo-9737e",storageBucket:"bingo-9737e.firebasestorage.app",messagingSenderId:"74980412774",appId:"1:74980412774:web:1eee26dd7849ea07ab0ca7"};
+const fbApp=initializeApp(firebaseConfig);
+const db=getDatabase(fbApp);
+const sorteiosRef=ref(db,'sorteios');
+const vendasRef=ref(db,'vendas');
+
+onValue(sorteiosRef,()=>{document.getElementById('fbDot').className='fb-dot ok';document.getElementById('fbStatus').textContent='Firebase conectado';},()=>{document.getElementById('fbDot').className='fb-dot err';document.getElementById('fbStatus').textContent='Sem conexão';});
+
+const COLS=['B','I','N','G','O'];
+const RANGES={B:[1,15],I:[16,30],N:[31,45],G:[46,60],O:[61,75]};
+const SECRET='bingofest2025';
+const BASE_URL='https://joeldes-hub.github.io/bingoonline/cartela.html';
+const ADMIN_USER='ADMIN',ADMIN_PASS='@ADMIN';
+
+function shuffle(a){for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;}
+function hashStr(s){let h=0;for(let i=0;i<s.length;i++)h=(Math.imul(31,h)+s.charCodeAt(i))|0;return Math.abs(h).toString(36);}
+function encodeCartela(card,nome,idx){const nums=[];card.forEach(col=>col.forEach(n=>nums.push(n)));const payload=nums.join(',');return btoa(payload+'|'+hashStr(SECRET+nome+idx+payload)).replace(/\+/g,'-').replace(/\//g,'_').replace(/=/g,'');}
+function gerarUmaCartela(){const card=[];for(const col of COLS){const[mn,mx]=RANGES[col];const pool=Array.from({length:mx-mn+1},(_,i)=>mn+i);shuffle(pool);card.push(pool.slice(0,5));}return card;}
+function toastMsg(msg,type='ok'){const t=document.getElementById('toast');t.textContent=(type==='ok'?'✅ ':'❌ ')+msg;t.style.borderColor=type==='ok'?'rgba(61,255,192,0.3)':'rgba(255,82,82,0.3)';t.classList.add('show');setTimeout(()=>t.classList.remove('show'),3000);}
+
+// LOGIN
+window.fazerLogin=function(){
+  const u=document.getElementById('lUser').value.trim(),p=document.getElementById('lPass').value;
+  if(u===ADMIN_USER&&p===ADMIN_PASS){sessionStorage.setItem('bf_auth','ok');document.getElementById('loginScreen').style.display='none';}
+  else{document.getElementById('lErro').classList.add('show');document.getElementById('lPass').value='';setTimeout(()=>document.getElementById('lErro').classList.remove('show'),3000);}
+};
+window.fazerLogout=function(){sessionStorage.removeItem('bf_auth');location.reload();};
+document.getElementById('lPass').addEventListener('keydown',e=>{if(e.key==='Enter')window.fazerLogin();});
+document.getElementById('lUser').addEventListener('keydown',e=>{if(e.key==='Enter')document.getElementById('lPass').focus();});
+if(sessionStorage.getItem('bf_auth')==='ok')document.getElementById('loginScreen').style.display='none';
+
+let sorteiosData={},vendasData={};
+onValue(sorteiosRef,snap=>{sorteiosData=snap.val()||{};renderSorteios();atualizarSelects();});
+onValue(vendasRef,snap=>{vendasData=snap.val()||{};filtrarVendas();});
+
+// SORTEIOS
+window.criarSorteio=function(){
+  const nome=document.getElementById('sNome').value.trim(),produto=document.getElementById('sProduto').value.trim(),data=document.getElementById('sData').value.trim();
+  if(!nome||!produto){toastMsg('Preencha nome e produto','err');return;}
+  const id='s'+Date.now().toString(36);
+  set(ref(db,'sorteios/'+id),{id,nome,produto,data,status:'aguardando',drawn:[],sorteioId:id,ts:Date.now(),totalCartelas:0,totalJogadores:0})
+    .then(()=>{document.getElementById('sNome').value='';document.getElementById('sProduto').value='';document.getElementById('sData').value='';toastMsg('Sorteio criado!');});
+};
+
+function renderSorteios(){
+  const grid=document.getElementById('sorteiosGrid');
+  const lista=Object.values(sorteiosData).sort((a,b)=>b.ts-a.ts);
+  if(!lista.length){grid.innerHTML='<div class="empty-state"><div class="ei">🏆</div><h3>Nenhum sorteio</h3><p>Crie seu primeiro sorteio acima</p></div>';return;}
+  grid.innerHTML='';
+  lista.forEach(s=>{
+    const drawn=(s.drawn||[]).length;
+    const statusBadge=s.status==='ativo'?'<span class="badge badge-green">● Ativo</span>':s.status==='encerrado'?'<span class="badge badge-red">Encerrado</span>':'<span class="badge badge-yellow">Aguardando</span>';
+    const card=document.createElement('div');card.className='sorteio-card '+s.status;
+    card.innerHTML=`
+      <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:0.5rem"><div class="sc-nome">${s.nome}</div>${statusBadge}</div>
+      <div class="sc-produto">🏆 ${s.produto}</div>
+      <div class="sc-info">📅 ${s.data||'Data não definida'}</div>
+      <div class="sc-stats">
+        <div class="sc-stat"><div class="sc-stat-val">${s.totalJogadores||0}</div><div class="sc-stat-lbl">Jogadores</div></div>
+        <div class="sc-stat"><div class="sc-stat-val">${s.totalCartelas||0}</div><div class="sc-stat-lbl">Cartelas</div></div>
+        <div class="sc-stat"><div class="sc-stat-val">${drawn}/75</div><div class="sc-stat-lbl">Sorteados</div></div>
+      </div>
+      <div class="sc-actions">
+        ${s.status!=='ativo'?`<button class="btn-green" onclick="ativarSorteio('${s.id}')">▶ Ativar</button>`:''}
+        ${s.status==='ativo'?`<button class="btn-secondary" onclick="encerrarSorteio('${s.id}')">⏹ Encerrar</button>`:''}
+        <button class="btn-danger" onclick="deletarSorteioCompleto('${s.id}','${s.nome}')">🗑 Excluir Sorteio e Cartelas</button>
+      </div>`;
+    grid.appendChild(card);
+  });
+}
+
+window.ativarSorteio=function(id){
+  Object.keys(sorteiosData).forEach(k=>{if(sorteiosData[k].status==='ativo')update(ref(db,'sorteios/'+k),{status:'aguardando'});});
+  update(ref(db,'sorteios/'+id),{status:'ativo'});toastMsg('Sorteio ativado!');
+};
+window.encerrarSorteio=function(id){update(ref(db,'sorteios/'+id),{status:'encerrado'});toastMsg('Sorteio encerrado');};
+window.deletarSorteioCompleto=function(id,nome){
+  if(!confirm(`Excluir o sorteio "${nome}" e TODAS as cartelas e vendas relacionadas?\n\nEsta ação não pode ser desfeita.`)) return;
+  remove(ref(db,'sorteios/'+id));
+  Object.entries(vendasData).forEach(([k,v])=>{if(v.sorteioId===id)remove(ref(db,'vendas/'+k));});
+  toastMsg('Sorteio e todas as cartelas excluídos!');
+};
+
+function atualizarSelects(){
+  const lista=Object.values(sorteiosData).sort((a,b)=>b.ts-a.ts);
+  const gs=document.getElementById('genSorteioSel');const gv=gs.value;
+  gs.innerHTML='<option value="">— Selecione um sorteio —</option>';
+  const vf=document.getElementById('vendasFiltro');const vv=vf.value;
+  vf.innerHTML='<option value="todos">Todos os sorteios</option>';
+  lista.forEach(s=>{gs.innerHTML+=`<option value="${s.id}">${s.nome} — ${s.produto}</option>`;vf.innerHTML+=`<option value="${s.id}">${s.nome} — ${s.produto}</option>`;});
+  if(gv)gs.value=gv;if(vv)vf.value=vv;
+}
+
+// GERADOR
+let geradas=[];
+document.getElementById('genSorteioSel').addEventListener('change',function(){
+  const s=sorteiosData[this.value];
+  document.getElementById('genSorteioInfo').innerHTML=s?`<span class="badge badge-yellow">🏆 ${s.produto}</span> &nbsp;<span class="badge badge-blue">📅 ${s.data||'—'}</span>`:'';
+});
+
+window.gerarCartelas=function(){
+  const sorteioId=document.getElementById('genSorteioSel').value;
+  if(!sorteioId){toastMsg('Selecione um sorteio primeiro','err');return;}
+  const sorteio=sorteiosData[sorteioId];
+  const nome=document.getElementById('genNome').value.trim();
+  const wpp=document.getElementById('genWpp').value.trim();
+  const qtd=parseInt(document.getElementById('genQtd').value)||1;
+  if(!nome){toastMsg('Digite o nome do jogador','err');return;}
+  if(!wpp){toastMsg('Digite o WhatsApp','err');return;}
+  geradas=[];
+  for(let i=0;i<qtd;i++)geradas.push(gerarUmaCartela());
+  const totalAtual=sorteio.totalCartelas||0;
+  const cartelaIds=geradas.map((_,i)=>String(totalAtual+i+1).padStart(4,'0'));
+  const params=new URLSearchParams();
+  params.set('sid',sorteioId);params.set('nome',nome);params.set('qtd',qtd);params.set('data',sorteio.data||'');
+  cartelaIds.forEach((cid,i)=>params.set('cid'+(i+1),cid));
+  geradas.forEach((card,i)=>params.set('c'+(i+1),encodeCartela(card,nome,i+1)));
+  const url=BASE_URL+'?'+params.toString();
+  const vendaId='v'+Date.now().toString(36);
+  set(ref(db,'vendas/'+vendaId),{sorteioId,sorteioNome:sorteio.nome,sorteioNomeProduto:sorteio.produto,nome,wpp,qtd,cartelaIds,url,ts:Date.now()});
+  update(ref(db,'sorteios/'+sorteioId),{totalCartelas:totalAtual+qtd,totalJogadores:(sorteio.totalJogadores||0)+1});
+  document.getElementById('rbTitle').textContent=`${qtd} cartela${qtd>1?'s':''} — ${nome}`;
+  document.getElementById('rbSubtitle').textContent=`Sorteio: ${sorteio.nome} | WhatsApp: ${wpp} | Cartelas: #${cartelaIds.join(', #')}`;
+  document.getElementById('linkBox').innerHTML=`<span>🔗 Link:</span><br>${url}`;
+  const msg=encodeURIComponent(`🎱 *BingoFest* — Suas Cartelas!\n\nOlá *${nome}*!\nSorteio: *${sorteio.nome}*\n🏆 Prêmio: ${sorteio.produto}\n📅 ${sorteio.data||''}\nSeus números: *#${cartelaIds.join(', #')}*\n\n👇 Acesse:\n${url}\n\nBoa sorte! 🍀`);
+  document.getElementById('btnWpp').href=`https://wa.me/55${wpp}?text=${msg}`;
+  const preview=document.getElementById('cartelasPreview');
+  preview.innerHTML='';const cols=Math.min(qtd,3);preview.style.gridTemplateColumns=`repeat(${cols},1fr)`;
+  geradas.forEach((card,i)=>preview.appendChild(renderPreview(card,cartelaIds[i])));
+  document.getElementById('resultadoBox').classList.add('show');
+  document.getElementById('resultadoBox').scrollIntoView({behavior:'smooth'});
+  toastMsg('Cartelas geradas e venda registrada!');
+};
+
+function renderPreview(card,id){
+  const w=document.createElement('div');w.className='cpg';w.innerHTML=`<div class="cpg-id">Cartela #${id}</div>`;
+  const lets=document.createElement('div');lets.className='cpg-letters';
+  COLS.forEach(c=>{const d=document.createElement('div');d.className='cpg-l '+c;d.textContent=c;lets.appendChild(d);});
+  w.appendChild(lets);const g=document.createElement('div');g.className='cpg-grid';
+  for(let row=0;row<5;row++)for(let ci=0;ci<5;ci++){
+    const cell=document.createElement('div');
+    if(row===2&&ci===2){cell.className='cpg-num free';cell.textContent='FREE';}
+    else{cell.className='cpg-num';cell.textContent=card[ci][row];}
+    g.appendChild(cell);
+  }
+  w.appendChild(g);return w;
+}
+window.copiarLink=function(){navigator.clipboard.writeText(document.getElementById('linkBox').textContent.replace('🔗 Link:','').trim()).then(()=>toastMsg('Link copiado!'));};
+window.novaGeracao=function(){document.getElementById('resultadoBox').classList.remove('show');document.getElementById('genNome').value='';document.getElementById('genWpp').value='';};
+
+// VENDAS
+window.filtrarVendas=function(){
+  const filtro=document.getElementById('vendasFiltro').value;
+  const lista=Object.entries(vendasData).map(([k,v])=>({...v,_key:k})).filter(v=>filtro==='todos'||v.sorteioId===filtro).sort((a,b)=>b.ts-a.ts);
+  document.getElementById('vendasSummary').innerHTML=`
+    <div class="vs-item"><div class="vs-val">${lista.length}</div><div class="vs-lbl">Jogadores</div></div>
+    <div class="vs-item"><div class="vs-val">${lista.reduce((s,v)=>s+(v.qtd||0),0)}</div><div class="vs-lbl">Cartelas</div></div>`;
+  const container=document.getElementById('vendasContainer');
+  if(!lista.length){container.innerHTML='<div class="empty-state"><div class="ei">📋</div><h3>Nenhuma venda</h3><p>As vendas aparecerão aqui após gerar cartelas</p></div>';return;}
+  container.innerHTML=`<div style="overflow-x:auto"><table class="vendas-table"><thead><tr>
+    <th>#</th><th>Nome</th><th>WhatsApp</th>
+    <th>Cartelas <span style="color:var(--muted);font-size:0.6rem;font-weight:400">(clique para excluir)</span></th>
+    <th>Sorteio</th><th>Data</th><th>Ações</th>
+  </tr></thead><tbody id="vendasTbody"></tbody></table></div>`;
+  const tbody=document.getElementById('vendasTbody');
+  lista.forEach((v,i)=>{
+    const dt=new Date(v.ts).toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'});
+    const chips=(v.cartelaIds||[]).map(c=>`<span class="chip" onclick="abrirModalCartela('${v._key}','${c}','${v.nome}')" title="Clique para excluir cartela #${c}">#${c}</span>`).join('');
+    const tr=document.createElement('tr');
+    tr.innerHTML=`
+      <td style="color:var(--muted)">${i+1}</td>
+      <td><strong>${v.nome}</strong></td>
+      <td><a href="https://wa.me/55${v.wpp}" target="_blank" style="color:var(--green);text-decoration:none">📲 ${v.wpp}</a></td>
+      <td><div class="cartela-chips">${chips}</div><div class="chip-hint">Clique em uma cartela para excluir</div></td>
+      <td><div style="font-size:0.78rem"><strong>${v.sorteioNome||'—'}</strong><br><span style="color:var(--muted)">${v.sorteioNomeProduto||''}</span></div></td>
+      <td style="color:var(--muted);font-size:0.78rem">${dt}</td>
+      <td>
+        <div style="display:flex;gap:0.4rem;flex-wrap:wrap">
+          <a class="btn-wpp" href="https://wa.me/55${v.wpp}?text=${encodeURIComponent('🎱 Link das suas cartelas:\n'+v.url)}" target="_blank">📲 Reenviar</a>
+          <button class="btn-danger" onclick="abrirModalTodas('${v._key}','${v.nome}')">🗑 Excluir</button>
+        </div>
+      </td>`;
+    tbody.appendChild(tr);
+  });
+};
+
+// MODAL EXCLUIR CARTELAS
+let modalVendaKey=null,modalCartelasSel=new Set();
+
+window.abrirModalCartela=function(vendaKey,cartelaId,nome){
+  const venda=vendasData[vendaKey];if(!venda)return;
+  modalVendaKey=vendaKey;modalCartelasSel=new Set([cartelaId]);
+  document.getElementById('modalSub').innerHTML=`<strong>${nome}</strong><br>Selecione quais cartelas deseja excluir.<br><span style="color:var(--red);font-size:0.75rem">⚠️ As cartelas excluídas não poderão mais acessar o jogo.</span>`;
+  renderModalChips(venda);
+  document.getElementById('modalExcluir').classList.add('show');
+};
+
+window.abrirModalTodas=function(vendaKey,nome){
+  const venda=vendasData[vendaKey];if(!venda)return;
+  modalVendaKey=vendaKey;modalCartelasSel=new Set(venda.cartelaIds||[]);
+  document.getElementById('modalSub').innerHTML=`<strong>${nome}</strong><br>Todas as cartelas selecionadas. Desmarque as que deseja manter.<br><span style="color:var(--red);font-size:0.75rem">⚠️ Se excluir todas, o jogador será removido do controle.</span>`;
+  renderModalChips(venda);
+  document.getElementById('modalExcluir').classList.add('show');
+};
+
+function renderModalChips(venda){
+  const container=document.getElementById('modalChips');container.innerHTML='';
+  const ids=venda.cartelaIds||[];
+  const allSel=modalCartelasSel.size===ids.length;
+  const all=document.createElement('div');
+  all.className='modal-chip all-btn'+(allSel?' sel':'');
+  all.textContent=allSel?'✓ TODAS SELECIONADAS':'SELECIONAR TODAS';
+  all.onclick=()=>{if(allSel)modalCartelasSel.clear();else modalCartelasSel=new Set(ids);renderModalChips(venda);};
+  container.appendChild(all);
+  ids.forEach(cid=>{
+    const chip=document.createElement('div');
+    chip.className='modal-chip'+(modalCartelasSel.has(cid)?' sel':'');
+    chip.textContent='#'+cid;
+    chip.onclick=()=>{if(modalCartelasSel.has(cid))modalCartelasSel.delete(cid);else modalCartelasSel.add(cid);renderModalChips(venda);};
+    container.appendChild(chip);
+  });
+}
+
+window.fecharModal=function(){document.getElementById('modalExcluir').classList.remove('show');modalVendaKey=null;modalCartelasSel=new Set();};
+
+window.confirmarExclusao=function(){
+  if(!modalVendaKey||modalCartelasSel.size===0){toastMsg('Selecione pelo menos uma cartela','err');return;}
+  const venda=vendasData[modalVendaKey];if(!venda)return;
+  const restantes=(venda.cartelaIds||[]).filter(c=>!modalCartelasSel.has(c));
+  const excluidas=modalCartelasSel.size;
+  const s=sorteiosData[venda.sorteioId];
+  if(restantes.length===0){
+    remove(ref(db,'vendas/'+modalVendaKey));
+    if(s)update(ref(db,'sorteios/'+venda.sorteioId),{totalCartelas:Math.max(0,(s.totalCartelas||0)-venda.qtd),totalJogadores:Math.max(0,(s.totalJogadores||0)-1)});
+    toastMsg('Jogador e todas as cartelas excluídos!');
+  } else {
+    update(ref(db,'vendas/'+modalVendaKey),{cartelaIds:restantes,qtd:restantes.length});
+    if(s)update(ref(db,'sorteios/'+venda.sorteioId),{totalCartelas:Math.max(0,(s.totalCartelas||0)-excluidas)});
+    toastMsg(`${excluidas} cartela${excluidas>1?'s':''} excluída${excluidas>1?'s':''}!`);
+  }
+  window.fecharModal();
+};
+
+window.exportarCSV=function(){
+  const filtro=document.getElementById('vendasFiltro').value;
+  const lista=Object.values(vendasData).filter(v=>filtro==='todos'||v.sorteioId===filtro).sort((a,b)=>b.ts-a.ts);
+  if(!lista.length){toastMsg('Nenhuma venda para exportar','err');return;}
+  const rows=lista.map(v=>`"${v.nome}","${v.wpp}","${(v.cartelaIds||[]).map(c=>'#'+c).join(' ')}","${v.sorteioNome||''}","${v.sorteioNomeProduto||''}","${new Date(v.ts).toLocaleDateString('pt-BR')}"`).join('\n');
+  const blob=new Blob(['Nome,WhatsApp,Cartelas,Sorteio,Produto,Data\n'+rows],{type:'text/csv;charset=utf-8;'});
+  const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='vendas_bingo.csv';a.click();
+  toastMsg('CSV exportado!');
+};
+
+window.switchTab=function(tab,btn){
+  document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+  document.getElementById('view-'+tab).classList.add('active');btn.classList.add('active');
+};
+</script>
+</body>
+</html>
