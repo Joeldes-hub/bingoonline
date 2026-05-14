@@ -1,0 +1,1083 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BingoFest — Apresentador</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Nunito:wght@400;600;700;900&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#07070e;--card:#0f0f1e;--card2:#141428;--accent:#f7c948;--pink:#ff4d8d;--blue:#4d9fff;--green:#3dffc0;--purple:#b06dff;--red:#ff5252;--text:#f0eeff;--muted:#6666aa;--border:rgba(255,255,255,0.07);--B:#4d9fff;--I:#f7c948;--N:#ff4d8d;--G:#3dffc0;--O:#b06dff;}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{background:var(--bg);color:var(--text);font-family:'Nunito',sans-serif;min-height:100vh;}
+body::before{content:'';position:fixed;inset:0;pointer-events:none;background:radial-gradient(ellipse 60% 40% at 10% 10%,rgba(255,77,141,0.07) 0%,transparent 60%),radial-gradient(ellipse 50% 50% at 90% 90%,rgba(77,159,255,0.06) 0%,transparent 60%);}
+
+/* LOGIN */
+#loginScreen{position:fixed;inset:0;z-index:999;background:var(--bg);display:flex;align-items:center;justify-content:center;}
+.login-box{background:var(--card);border:1px solid var(--border);border-radius:24px;padding:2.5rem 2rem;width:100%;max-width:380px;box-shadow:0 30px 80px rgba(0,0,0,0.5);}
+.login-logo{font-family:'Bebas Neue',sans-serif;font-size:2.5rem;letter-spacing:4px;background:linear-gradient(135deg,var(--accent),var(--pink));-webkit-background-clip:text;-webkit-text-fill-color:transparent;text-align:center;margin-bottom:0.3rem;}
+.login-sub{text-align:center;color:var(--muted);font-size:0.8rem;margin-bottom:2rem;}
+.login-field{display:flex;flex-direction:column;gap:0.5rem;margin-bottom:1.2rem;}
+.login-field label{font-size:0.7rem;letter-spacing:2px;text-transform:uppercase;color:var(--muted);font-weight:700;}
+.login-field input{background:rgba(255,255,255,0.04);border:1px solid var(--border);border-radius:10px;padding:0.8rem 1rem;color:var(--text);font-family:'Nunito',sans-serif;font-size:1rem;font-weight:600;outline:none;transition:border-color 0.2s;}
+.login-field input:focus{border-color:rgba(247,201,72,0.4);}
+.btn-login{width:100%;padding:0.9rem;background:linear-gradient(135deg,var(--pink),var(--accent));color:#07070e;border:none;border-radius:12px;font-family:'Bebas Neue',sans-serif;font-size:1.4rem;letter-spacing:3px;cursor:pointer;}
+.login-erro{display:none;text-align:center;color:var(--red);font-size:0.8rem;font-weight:700;margin-top:0.8rem;background:rgba(255,82,82,0.08);border:1px solid rgba(255,82,82,0.2);border-radius:8px;padding:0.5rem;}
+.login-erro.show{display:block;}
+
+/* NAV */
+.nav{position:sticky;top:0;z-index:50;background:rgba(7,7,14,0.97);border-bottom:1px solid var(--border);padding:0.8rem 1.5rem;display:flex;align-items:center;justify-content:space-between;backdrop-filter:blur(12px);}
+.logo{font-family:'Bebas Neue',sans-serif;font-size:1.5rem;letter-spacing:3px;background:linear-gradient(135deg,var(--accent),var(--pink));-webkit-background-clip:text;-webkit-text-fill-color:transparent;}
+.nav-right{display:flex;align-items:center;gap:1rem;}
+.fb-status{display:flex;align-items:center;gap:0.4rem;font-size:0.72rem;color:var(--muted);}
+.fb-dot{width:7px;height:7px;border-radius:50%;background:var(--muted);}
+.fb-dot.ok{background:var(--green);animation:pulse 1.5s ease-in-out infinite;}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.4}}
+.btn-logout{background:none;border:1px solid var(--border);color:var(--muted);padding:0.4rem 0.8rem;border-radius:8px;font-size:0.75rem;font-weight:700;cursor:pointer;transition:all 0.2s;}
+.btn-logout:hover{color:var(--red);border-color:rgba(255,82,82,0.3);}
+
+.page{max-width:1100px;margin:0 auto;padding:2rem;position:relative;z-index:1;}
+
+/* SELEÇÃO DE SORTEIO */
+.sorteio-sel-box{background:var(--card);border:1px solid var(--border);border-radius:20px;padding:1.5rem;margin-bottom:2rem;}
+.ssb-title{font-family:'Bebas Neue',sans-serif;font-size:1.2rem;letter-spacing:2px;margin-bottom:1rem;}
+.ssb-row{display:flex;align-items:center;gap:1rem;flex-wrap:wrap;}
+.ssb-sel{flex:1;background:rgba(255,255,255,0.04);border:1px solid rgba(247,201,72,0.3);border-radius:10px;padding:0.75rem 1rem;color:var(--text);font-family:'Nunito',sans-serif;font-size:0.95rem;font-weight:700;outline:none;min-width:220px;}
+.ssb-sel option{background:#0f0f1e;}
+.modo-box{display:flex;align-items:center;gap:0.55rem;background:rgba(255,255,255,0.04);border:1px solid var(--border);border-radius:10px;padding:0.55rem 0.7rem;flex-wrap:wrap;}
+.modo-title{font-size:0.62rem;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted);font-weight:900;}
+.modo-op{display:flex;align-items:center;gap:0.25rem;font-size:0.75rem;color:var(--text);font-weight:800;cursor:pointer;white-space:nowrap;}
+.modo-op input{accent-color:var(--accent);}
+.btn-ativar{background:linear-gradient(135deg,var(--green),#2be8a8);color:#07070e;border:none;border-radius:10px;padding:0.75rem 1.5rem;font-family:'Bebas Neue',sans-serif;font-size:1.1rem;letter-spacing:2px;cursor:pointer;transition:all 0.2s;white-space:nowrap;}
+.btn-ativar:hover{filter:brightness(1.1);}
+.sorteio-ativo-info{background:rgba(61,255,192,0.06);border:1px solid rgba(61,255,192,0.2);border-radius:12px;padding:1rem 1.2rem;display:none;}
+.sorteio-ativo-info.show{display:block;}
+.sai-nome{font-family:'Bebas Neue',sans-serif;font-size:1.4rem;letter-spacing:2px;color:var(--green);}
+.sai-produto{color:var(--accent);font-size:0.85rem;font-weight:700;margin-top:0.2rem;}
+.sai-data{color:var(--muted);font-size:0.78rem;margin-top:0.1rem;}
+.sai-stats{display:flex;gap:1.5rem;margin-top:0.8rem;flex-wrap:wrap;}
+.sai-stat{text-align:center;}
+.sai-val{font-family:'Bebas Neue',sans-serif;font-size:1.4rem;color:var(--accent);letter-spacing:1px;}
+.sai-lbl{font-size:0.6rem;letter-spacing:1px;text-transform:uppercase;color:var(--muted);}
+
+/* ÁREA SEM SORTEIO */
+.no-sorteio{text-align:center;padding:4rem 2rem;background:var(--card);border:1px solid var(--border);border-radius:20px;}
+.no-sorteio .ni{font-size:3rem;margin-bottom:1rem;}
+.no-sorteio h3{font-family:'Bebas Neue',sans-serif;font-size:1.5rem;letter-spacing:2px;margin-bottom:0.5rem;}
+.no-sorteio p{color:var(--muted);font-size:0.9rem;}
+
+/* PAINEL SORTEIO */
+.sorteio-panel{display:none;}
+.sorteio-panel.show{display:block;}
+.ap-controls{display:flex;gap:0.8rem;align-items:center;flex-wrap:wrap;margin-bottom:1.5rem;}
+.drawn-badge{background:rgba(255,255,255,0.05);border:1px solid var(--border);border-radius:8px;padding:0.5rem 1rem;font-size:0.8rem;color:var(--muted);font-weight:700;}
+.drawn-badge em{color:var(--accent);font-style:normal;font-family:'Bebas Neue',sans-serif;font-size:1.1rem;}
+.btn-sortear{background:linear-gradient(135deg,var(--pink),var(--accent));color:#07070e;border:none;border-radius:12px;padding:0.9rem 2.5rem;font-family:'Bebas Neue',sans-serif;font-size:1.5rem;letter-spacing:3px;cursor:pointer;transition:all 0.2s;}
+.btn-sortear:hover{filter:brightness(1.1);transform:scale(1.03);}
+.btn-sortear:disabled{opacity:0.4;cursor:not-allowed;transform:none;}
+.btn-reset-ap{background:none;border:1px solid rgba(255,82,82,0.3);color:var(--red);padding:0.7rem 1.1rem;border-radius:10px;font-weight:700;font-size:0.8rem;letter-spacing:1px;cursor:pointer;transition:all 0.2s;}
+.btn-reset-ap:hover{background:rgba(255,82,82,0.1);}
+
+/* SORTEIO MANUAL */
+.manual-draw-box{
+  background:rgba(255,255,255,0.04);
+  border:1px solid rgba(247,201,72,0.22);
+  border-radius:14px;
+  padding:0.8rem;
+  display:flex;
+  align-items:center;
+  gap:0.6rem;
+  flex-wrap:wrap;
+}
+.manual-draw-label{
+  font-size:0.68rem;
+  letter-spacing:2px;
+  text-transform:uppercase;
+  color:var(--accent);
+  font-weight:1000;
+  white-space:nowrap;
+}
+.manual-draw-input{
+  width:105px;
+  background:#090914;
+  border:2px solid rgba(247,201,72,0.35);
+  color:#fff;
+  border-radius:10px;
+  padding:0.72rem 0.8rem;
+  font-family:'Bebas Neue',sans-serif;
+  font-size:1.35rem;
+  font-weight:1000;
+  letter-spacing:2px;
+  text-align:center;
+  outline:none;
+}
+.manual-draw-input:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(247,201,72,0.12);}
+.btn-manual-draw{
+  background:rgba(77,159,255,0.14);
+  border:2px solid rgba(77,159,255,0.35);
+  color:#fff;
+  padding:0.78rem 1rem;
+  border-radius:10px;
+  font-family:'Bebas Neue',sans-serif;
+  font-size:1.08rem;
+  font-weight:1000;
+  letter-spacing:2px;
+  cursor:pointer;
+}
+.btn-manual-draw:hover{background:rgba(77,159,255,0.25);}
+.manual-draw-help{
+  width:100%;
+  color:var(--muted);
+  font-size:0.75rem;
+  font-weight:900;
+  line-height:1.35;
+}
+.ap-layout{display:grid;grid-template-columns:1fr 320px;gap:1.5rem;}
+.draw-panel{background:var(--card);border:1px solid var(--border);border-radius:20px;padding:2rem;}
+.draw-top{display:flex;align-items:center;gap:2rem;margin-bottom:1.5rem;}
+.big-ball{width:110px;height:110px;border-radius:50%;flex-shrink:0;display:flex;flex-direction:column;align-items:center;justify-content:center;background:linear-gradient(145deg,#1a1a35,#0d0d22);border:3px solid var(--border);transition:all 0.4s;}
+.big-ball.pop{animation:bpop 0.5s cubic-bezier(0.34,1.56,0.64,1);}
+@keyframes bpop{0%{transform:scale(0.3);opacity:0}60%{transform:scale(1.15)}100%{transform:scale(1);opacity:1}}
+.big-ball.B{border-color:var(--B);box-shadow:0 0 30px rgba(77,159,255,0.3);}
+.big-ball.I{border-color:var(--I);box-shadow:0 0 30px rgba(247,201,72,0.3);}
+.big-ball.N{border-color:var(--N);box-shadow:0 0 30px rgba(255,77,141,0.3);}
+.big-ball.G{border-color:var(--G);box-shadow:0 0 30px rgba(61,255,192,0.3);}
+.big-ball.O{border-color:var(--O);box-shadow:0 0 30px rgba(176,109,255,0.3);}
+.bl{font-family:'Bebas Neue',sans-serif;font-size:0.85rem;letter-spacing:2px;line-height:1;}
+.bn{font-family:'Bebas Neue',sans-serif;font-size:3.2rem;letter-spacing:1px;line-height:1;}
+.big-ball.B .bl,.big-ball.B .bn{color:var(--B)}.big-ball.I .bl,.big-ball.I .bn{color:var(--I)}
+.big-ball.N .bl,.big-ball.N .bn{color:var(--N)}.big-ball.G .bl,.big-ball.G .bn{color:var(--G)}
+.big-ball.O .bl,.big-ball.O .bn{color:var(--O)}
+.draw-info h3{font-family:'Bebas Neue',sans-serif;font-size:1.3rem;letter-spacing:2px;margin-bottom:0.3rem;}
+.draw-info p{color:var(--muted);font-size:0.85rem;}
+.last-balls{display:flex;gap:0.5rem;flex-wrap:wrap;}
+.mball{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:'Bebas Neue',sans-serif;font-size:0.8rem;border:2px solid;}
+.mball.B{border-color:var(--B);color:var(--B);background:rgba(77,159,255,0.1)}
+.mball.I{border-color:var(--I);color:var(--I);background:rgba(247,201,72,0.1)}
+.mball.N{border-color:var(--N);color:var(--N);background:rgba(255,77,141,0.1)}
+.mball.G{border-color:var(--G);color:var(--G);background:rgba(61,255,192,0.1)}
+.mball.O{border-color:var(--O);color:var(--O);background:rgba(176,109,255,0.1)}
+.board-panel{background:var(--card);border:1px solid var(--border);border-radius:20px;padding:1.5rem;}
+.bp-title{font-family:'Bebas Neue',sans-serif;font-size:1rem;letter-spacing:2px;color:var(--muted);margin-bottom:1rem;}
+.bp-heads{display:grid;grid-template-columns:repeat(5,1fr);gap:3px;margin-bottom:3px;}
+.bp-h{text-align:center;font-family:'Bebas Neue',sans-serif;font-size:0.9rem;letter-spacing:2px;padding:0.4rem;border-radius:6px;}
+.bp-h.B{color:var(--B);background:rgba(77,159,255,0.1)}.bp-h.I{color:var(--I);background:rgba(247,201,72,0.1)}
+.bp-h.N{color:var(--N);background:rgba(255,77,141,0.1)}.bp-h.G{color:var(--G);background:rgba(61,255,192,0.1)}
+.bp-h.O{color:var(--O);background:rgba(176,109,255,0.1)}
+.bp-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:3px;}
+.bp-num{aspect-ratio:1;display:flex;align-items:center;justify-content:center;font-family:'Bebas Neue',sans-serif;font-size:0.75rem;border-radius:5px;background:rgba(255,255,255,0.02);color:rgba(255,255,255,0.18);border:1px solid var(--border);transition:all 0.3s;}
+.bp-num.called.B{background:rgba(77,159,255,0.2);color:var(--B);border-color:rgba(77,159,255,0.3)}
+.bp-num.called.I{background:rgba(247,201,72,0.2);color:var(--I);border-color:rgba(247,201,72,0.3)}
+.bp-num.called.N{background:rgba(255,77,141,0.2);color:var(--N);border-color:rgba(255,77,141,0.3)}
+.bp-num.called.G{background:rgba(61,255,192,0.2);color:var(--G);border-color:rgba(61,255,192,0.3)}
+.bp-num.called.O{background:rgba(176,109,255,0.2);color:var(--O);border-color:rgba(176,109,255,0.3)}
+.toast{position:fixed;bottom:2rem;right:2rem;z-index:500;background:var(--card2);border:1px solid var(--border);border-radius:12px;padding:0.8rem 1.2rem;font-size:0.85rem;font-weight:700;display:none;align-items:center;gap:0.5rem;box-shadow:0 10px 30px rgba(0,0,0,0.4);}
+.toast.show{display:flex;}
+
+/* ALERTA DE BINGO */
+.bingo-alert{
+  display:none;margin-top:1.5rem;background:linear-gradient(145deg,rgba(61,255,192,0.11),rgba(255,77,141,0.08));
+  border:2px solid rgba(61,255,192,0.35);border-radius:20px;padding:1.3rem;
+  box-shadow:0 0 40px rgba(61,255,192,0.12);animation:alertPulse 1.3s ease-in-out infinite;
+}
+.bingo-alert.show{display:block;}
+.bingo-alert.invalid{border-color:rgba(255,82,82,0.45);background:rgba(255,82,82,0.08);animation:none;}
+@keyframes alertPulse{0%,100%{box-shadow:0 0 25px rgba(61,255,192,0.12)}50%{box-shadow:0 0 55px rgba(61,255,192,0.28)}}
+@keyframes cffall{0%{transform:translateY(-40px) rotate(0deg);opacity:1}100%{transform:translateY(110vh) rotate(720deg);opacity:0}}
+.ba-top{display:flex;align-items:flex-start;justify-content:space-between;gap:1rem;flex-wrap:wrap;margin-bottom:1rem;}
+.ba-title{font-family:'Bebas Neue',sans-serif;font-size:1.55rem;letter-spacing:3px;color:var(--green);}
+.bingo-alert.invalid .ba-title{color:var(--red);}
+.ba-sub{color:var(--muted);font-size:0.82rem;margin-top:0.2rem;line-height:1.5;}
+.ba-status{font-size:0.72rem;font-weight:900;letter-spacing:1px;text-transform:uppercase;border-radius:999px;padding:0.4rem 0.7rem;background:rgba(61,255,192,0.12);color:var(--green);border:1px solid rgba(61,255,192,0.25);}
+.ba-status.err{background:rgba(255,82,82,0.12);color:var(--red);border-color:rgba(255,82,82,0.25);}
+.ba-body{display:grid;grid-template-columns:260px 1fr;gap:1rem;align-items:start;}
+.ba-card{background:rgba(0,0,0,0.18);border:1px solid var(--border);border-radius:14px;padding:0.8rem;}
+.ba-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:3px;}
+.ba-cell{aspect-ratio:1;display:flex;align-items:center;justify-content:center;border-radius:6px;background:rgba(255,255,255,0.04);font-family:'Bebas Neue',sans-serif;font-size:0.82rem;color:var(--muted);border:1px solid var(--border);}
+.ba-cell.ok{background:rgba(61,255,192,0.18);color:var(--green);border-color:rgba(61,255,192,0.32);}
+.ba-cell.free{background:linear-gradient(135deg,var(--accent),var(--pink));color:#07070e;border-color:transparent;font-size:0.5rem;font-weight:900;}
+.ba-actions{display:flex;gap:0.7rem;flex-wrap:wrap;margin-top:1rem;}
+.btn-confirmar{background:linear-gradient(135deg,var(--green),#2be8a8);color:#07070e;border:none;border-radius:10px;padding:0.75rem 1.2rem;font-family:'Bebas Neue',sans-serif;font-size:1.1rem;letter-spacing:2px;cursor:pointer;}
+.btn-confirmar:disabled{opacity:0.45;cursor:not-allowed;filter:grayscale(1);}
+.btn-recusar{background:rgba(255,82,82,0.09);border:1px solid rgba(255,82,82,0.35);color:var(--red);border-radius:10px;padding:0.75rem 1.2rem;font-weight:900;cursor:pointer;}
+.ba-info-line{font-size:0.88rem;line-height:1.7;color:var(--text);}
+.ba-info-line strong{color:var(--accent);}
+@media(max-width:768px){.ba-body{grid-template-columns:1fr}.ba-card{max-width:280px}}
+
+@media(max-width:768px){.ap-layout{grid-template-columns:1fr;}}
+
+
+/* =========================================================
+   CORREÇÃO RESPONSIVA MOBILE — adicionada para GitHub Pages
+   Evita que o site abra no celular com aparência de desktop.
+   ========================================================= */
+html, body { width: 100%; max-width: 100%; overflow-x: hidden; }
+img, video, canvas, iframe { max-width: 100%; height: auto; }
+button, input, select, textarea { max-width: 100%; }
+* { -webkit-tap-highlight-color: transparent; }
+
+@media (max-width: 900px) {
+  .page, .main { width: 100%; max-width: 100%; padding-left: 1rem; padding-right: 1rem; }
+  .card, .login-box, .sorteio-sel-box, .draw-panel, .board-panel, .no-sorteio, .erro-box { max-width: 100%; }
+  .form-row, .form-row.c3, .ssb-row, .ap-controls, .draw-top, .vendas-filter, .vendas-summary, .rb-actions, .modal-actions { grid-template-columns: 1fr !important; flex-direction: column; align-items: stretch; }
+  .form-group input, .form-group select, .ssb-sel, .gss-sel, .btn-primary, .btn-secondary, .btn-danger, .btn-green, .btn-wpp, .btn-ativar, .btn-sortear, .btn-reset-ap, .btn-manual-draw, .manual-draw-input { width: 100%; }
+  .modal-box { width: calc(100vw - 2rem); max-height: 90vh; overflow-y: auto; padding: 1.2rem; }
+}
+
+@media (max-width: 768px) {
+  .nav, .header { position: relative; flex-wrap: wrap; align-items: center; gap: .55rem; padding: .75rem 1rem; }
+  .logo { font-size: 1.25rem; margin-right: 0; padding: 0; white-space: normal; }
+  .nav-right, .header-right { width: 100%; justify-content: space-between; margin-left: 0; gap: .5rem; }
+  .fb-status { font-size: .68rem; }
+  .tab-btn { flex: 1 1 calc(50% - .35rem); padding: .7rem .45rem; border: 1px solid var(--border); border-radius: 10px; background: rgba(255,255,255,.03); }
+  .tab-btn.active { border-bottom-color: var(--accent); }
+  .nav-badge { display: none !important; }
+  .page-header h1 { font-size: 1.6rem; }
+  .sorteios-grid { grid-template-columns: 1fr !important; }
+  .sai-stats, .sc-stats, .stats-bar { justify-content: space-between; gap: .6rem; }
+  .sai-stat, .sc-stat, .stat-item { flex: 1; min-width: 72px; }
+  .vendas-table { display: block; width: 100%; overflow-x: auto; white-space: nowrap; }
+  .vendas-table th, .vendas-table td { padding: .6rem; }
+  .cartela-chips, .modal-chips { max-width: 100%; }
+  .toast { left: 1rem; right: 1rem; bottom: 1rem; justify-content: center; text-align: center; }
+  .ap-layout { grid-template-columns: 1fr !important; }
+  .draw-top { text-align: center; align-items: center; }
+  .big-ball { margin: 0 auto; width: 96px; height: 96px; }
+  .bn { font-size: 2.7rem; }
+  .bp-grid, .bp-heads { gap: 4px; }
+  .bp-num { min-height: 34px; font-size: .72rem; }
+  .cartelas-grid, .cartelas-grid.c1, .cartelas-grid.c2, .cartelas-grid.c3, .cartelas-grid.c4, .cartelas-grid.c5p { grid-template-columns: 1fr !important; max-width: 420px; width: 100%; margin-left: auto; margin-right: auto; }
+}
+
+@media (max-width: 520px) {
+  body { font-size: 15px; }
+  .page, .main { padding: .85rem; }
+  .login-box { width: calc(100vw - 1.5rem); padding: 1.6rem 1rem; border-radius: 18px; }
+  .login-logo { font-size: 2rem; }
+  .page-header { margin-bottom: 1.2rem; }
+  .page-header h1 { font-size: 1.45rem; line-height: 1.05; }
+  .page-header p, .modal-sub, .sc-info, .chip-hint { font-size: .76rem; }
+  .card { padding: 1rem; border-radius: 16px; }
+  .card-title { font-size: 1.05rem; }
+  .form-group input, .form-group select, .login-field input { padding: .78rem .85rem; font-size: .95rem; }
+  .btn-primary, .btn-login, .btn-ativar, .btn-sortear { font-size: 1.08rem; letter-spacing: 1.5px; padding: .8rem 1rem; }
+  .sc-actions, .rb-actions, .modal-actions { display: grid; grid-template-columns: 1fr; }
+  .chip, .modal-chip { font-size: .82rem; padding: .42rem .6rem; }
+  .link-box { font-size: .72rem; }
+  .header { align-items: flex-start; }
+  .sorteio-info { order: 3; width: 100%; flex-basis: 100%; text-align: left; font-size: .68rem; }
+  .live-badge { font-size: .58rem; padding: .25rem .5rem; }
+  .ultimo-wrap { gap: .75rem; padding: .75rem; }
+  .unRecentesWrap, #unRecentesWrap { width: 100%; }
+  .c-num { font-size: .78rem; min-width: 0; }
+  .c-l { font-size: .78rem; padding: .2rem; }
+  .btn-bingo { width: 100%; padding: .85rem 1rem; font-size: 1.45rem; letter-spacing: 3px; }
+  .aviso-sorteio { top: 1rem; width: calc(100vw - 1.5rem); white-space: normal; text-align: center; font-size: .9rem; }
+  .draw-panel, .board-panel, .sorteio-sel-box, .no-sorteio { padding: 1rem; border-radius: 16px; }
+  .ap-controls { gap: .6rem; }
+  .drawn-badge { text-align: center; }
+  .last-balls { justify-content: center; }
+  .mball { width: 34px; height: 34px; }
+  .bp-num { min-height: 30px; font-size: .65rem; }
+  .ssb-title, .bp-title { font-size: .95rem; }
+}
+
+@media (max-width: 380px) {
+  .page, .main { padding-left: .6rem; padding-right: .6rem; }
+  .logo { font-size: 1.05rem; letter-spacing: 2px; }
+  .tab-btn { font-size: .61rem; letter-spacing: .3px; }
+  .c-num { font-size: .68rem; border-radius: 5px; }
+  .cpg-num { font-size: .62rem; }
+  .big-ball { width: 86px; height: 86px; }
+  .bn { font-size: 2.35rem; }
+}
+
+@media (max-width: 768px) { .nav { overflow: visible; } .nav > .logo { flex:1 1 100%; } .sorteio-ativo-info { padding:.9rem; } }
+
+
+
+/* =========================================================
+   MODO LEITURA FORTE — letras mais robustas e fáceis de ler
+   ========================================================= */
+html{font-size:17px;-webkit-text-size-adjust:100%;text-rendering:optimizeLegibility;}
+body{font-weight:800;color:#ffffff;letter-spacing:.015em;}
+body,button,input,select,textarea,a,td,th,p,div,span,label{font-family:'Nunito',sans-serif;font-weight:800;}
+.logo,.login-logo,.page-header h1,.card-title,.modal-title,.sc-nome,.btn-primary,.btn-secondary,.btn-danger,.btn-green,.btn-wpp,.btn-login,.tab-btn,.badge,.chip,.modal-chip,
+.ssb-title,.sai-nome,.bp-title,.btn-sortear,.btn-ativar,.btn-reset-ap,.draw-info h3,.bl,.bn,.mball,.bp-h,.bp-num,
+.nome-tag h2,.stat-val,.stat-lbl,.c-id,.c-bingo-tag,.c-l,.c-num,.btn-bingo,.un-label,.un-l,.un-n,.rec-i,.win-word,.win-cartela{
+  font-weight:900 !important;
+  text-shadow:0 1px 2px rgba(0,0,0,.45);
+}
+p,.page-header p,.login-sub,.modal-sub,.sc-info,.sorteio-info,.un-wait,.bingo-hint,.chip-hint,.form-group label,.login-field label,.gss-label,.sai-lbl,.stat-lbl,.vs-lbl,.sc-stat-lbl{
+  color:#d7d3ff !important;
+  font-weight:800 !important;
+}
+input,select,textarea{
+  color:#ffffff !important;
+  font-weight:900 !important;
+  font-size:1rem !important;
+  background:rgba(255,255,255,.075) !important;
+  border-color:rgba(255,255,255,.18) !important;
+}
+input::placeholder,textarea::placeholder{color:#aaa5de !important;font-weight:800 !important;opacity:1;}
+button,a.btn-wpp,.btn-primary,.btn-secondary,.btn-danger,.btn-green,.btn-login,.btn-sortear,.btn-ativar,.btn-reset-ap,.tab-btn{
+  font-weight:900 !important;
+  letter-spacing:.08em;
+  text-shadow:none;
+}
+.card,.sorteio-card,.draw-panel,.board-panel,.sorteio-sel-box,.login-box,.modal-box,.ultimo-wrap,.cartela-wrap,.vs-item{
+  border-color:rgba(255,255,255,.13) !important;
+}
+.badge,.chip,.modal-chip,.rec-i,.mball{font-weight:900 !important;}
+.vendas-table th,.vendas-table td{
+  color:#ffffff !important;
+  font-weight:850 !important;
+  font-size:.92rem !important;
+}
+.vendas-table th{color:#d7d3ff !important;font-weight:900 !important;}
+.empty-state h3{color:#ffffff !important;font-weight:900 !important;}
+.empty-state p{color:#d7d3ff !important;font-weight:800 !important;}
+
+/* Cartelas e números mais fortes */
+.c-num,.cpg-num{
+  color:#ffffff !important;
+  font-size:1.15rem !important;
+  font-weight:1000 !important;
+  letter-spacing:.04em !important;
+  background:rgba(255,255,255,.075) !important;
+  border:2px solid rgba(255,255,255,.16) !important;
+  text-shadow:0 2px 4px rgba(0,0,0,.75),0 0 8px rgba(255,255,255,.18) !important;
+}
+.c-num.marked{
+  color:#ffffff !important;
+  text-shadow:0 2px 4px rgba(0,0,0,.95),0 0 9px rgba(255,255,255,.35) !important;
+}
+.c-num.free,.cpg-num.free{
+  color:#07070e !important;
+  font-weight:1000 !important;
+  font-size:.62rem !important;
+  text-shadow:none !important;
+}
+.c-l,.cpg-l{
+  font-size:1rem !important;
+  font-weight:1000 !important;
+}
+.rec-i{
+  font-size:1rem !important;
+  font-weight:1000 !important;
+  padding:.36rem .65rem !important;
+  border-width:2px !important;
+}
+.stat-val,.vs-val,.sc-stat-val,.sai-val{font-weight:1000 !important;color:#ffe271 !important;}
+
+@media(max-width:768px){
+  html{font-size:16px;}
+  body{font-weight:850;}
+  .page{padding:1rem !important;}
+  .logo{font-size:1.45rem !important;}
+  .page-header h1{font-size:2.25rem !important;}
+  .card-title,.modal-title,.ssb-title{font-size:1.35rem !important;}
+  .tab-btn{font-size:.82rem !important;font-weight:1000 !important;}
+  .btn-primary,.btn-secondary,.btn-danger,.btn-green,.btn-wpp,.btn-login,.btn-sortear,.btn-ativar{font-size:1.05rem !important;font-weight:1000 !important;}
+  .c-num,.cpg-num{font-size:1.18rem !important;font-weight:1000 !important;}
+  .c-l,.cpg-l{font-size:1.05rem !important;}
+  .rec-i{font-size:1.05rem !important;}
+  .vendas-table th,.vendas-table td{font-size:.95rem !important;}
+}
+
+
+
+/* =========================================================
+   REFORÇO VISUAL DO PAINEL DE CONFERÊNCIA DO APRESENTADOR
+   Números sorteados ficam mais fortes e fáceis de enxergar.
+   ========================================================= */
+.bp-num{
+  font-size:1rem !important;
+  font-weight:900 !important;
+  min-height:38px !important;
+  color:rgba(255,255,255,.42) !important;
+  border:1px solid rgba(255,255,255,.12) !important;
+}
+.bp-num.called{
+  color:#ffffff !important;
+  font-size:1.12rem !important;
+  font-weight:900 !important;
+  border-width:2px !important;
+  transform:scale(1.03);
+  text-shadow:0 2px 4px rgba(0,0,0,.75) !important;
+  box-shadow:0 0 14px rgba(255,255,255,.18), inset 0 0 18px rgba(255,255,255,.08) !important;
+}
+.bp-num.called.B{background:linear-gradient(135deg,rgba(77,159,255,.92),rgba(77,159,255,.42)) !important;border-color:var(--B) !important;}
+.bp-num.called.I{background:linear-gradient(135deg,rgba(247,201,72,.98),rgba(247,201,72,.50)) !important;border-color:var(--I) !important;color:#07070e !important;text-shadow:0 1px 2px rgba(255,255,255,.35) !important;}
+.bp-num.called.N{background:linear-gradient(135deg,rgba(255,77,141,.95),rgba(255,77,141,.45)) !important;border-color:var(--N) !important;}
+.bp-num.called.G{background:linear-gradient(135deg,rgba(61,255,192,.95),rgba(61,255,192,.42)) !important;border-color:var(--G) !important;color:#061612 !important;text-shadow:0 1px 2px rgba(255,255,255,.35) !important;}
+.bp-num.called.O{background:linear-gradient(135deg,rgba(176,109,255,.95),rgba(176,109,255,.45)) !important;border-color:var(--O) !important;}
+.ba-cell.ok{
+  color:#ffffff !important;
+  font-weight:900 !important;
+  border-width:2px !important;
+  box-shadow:0 0 12px rgba(61,255,192,.22) !important;
+}
+
+
+
+/* =========================================================
+   TEMA EDUCA MAIS — inspirado na logomarca azul e branca
+   Paleta principal: azul institucional + branco + azul claro
+   ========================================================= */
+:root{
+  --bg:#f2f9ff !important;
+  --card:#ffffff !important;
+  --card2:#e8f5ff !important;
+  --accent:#0077bd !important;
+  --pink:#009fe3 !important;
+  --blue:#006fb6 !important;
+  --green:#00a6c8 !important;
+  --purple:#004f8f !important;
+  --red:#d62839 !important;
+  --text:#06345b !important;
+  --muted:#406c8d !important;
+  --border:rgba(0,119,189,0.22) !important;
+  --B:#005b99 !important;
+  --I:#008bd2 !important;
+  --N:#00a6e8 !important;
+  --G:#00b4d8 !important;
+  --O:#003f73 !important;
+}
+html,body{
+  background:
+    radial-gradient(circle at top left, rgba(0,119,189,.18), transparent 34%),
+    radial-gradient(circle at bottom right, rgba(0,159,227,.14), transparent 36%),
+    linear-gradient(180deg,#ffffff 0%,#eef8ff 45%,#dff2ff 100%) !important;
+  color:var(--text) !important;
+  font-weight:800 !important;
+  letter-spacing:.01em;
+}
+body::before{
+  background:
+    radial-gradient(ellipse 55% 36% at 12% 10%,rgba(0,119,189,0.12) 0%,transparent 65%),
+    radial-gradient(ellipse 48% 42% at 88% 88%,rgba(0,159,227,0.12) 0%,transparent 65%) !important;
+}
+body, input, select, textarea, button{
+  font-weight:800 !important;
+  -webkit-font-smoothing:antialiased;
+  text-rendering:optimizeLegibility;
+}
+.card,.login-box,.sorteio-card,.draw-panel,.board-panel,.sorteio-sel-box,.no-sorteio,
+.ultimo-wrap,.cartela-wrap,.erro-box,.modal-box,.resultado-box,.vs-item,.cpg,.link-box{
+  background:rgba(255,255,255,.94) !important;
+  border:2px solid rgba(0,119,189,.20) !important;
+  box-shadow:0 14px 38px rgba(0,80,130,.12) !important;
+  color:var(--text) !important;
+}
+.nav,.header{
+  background:rgba(255,255,255,.96) !important;
+  border-bottom:2px solid rgba(0,119,189,.22) !important;
+  box-shadow:0 8px 26px rgba(0,80,130,.10) !important;
+}
+.logo,.login-logo,.page-header h1,.card-title,.sc-nome,.modal-title,.ssb-title,.bp-title,
+.nome-tag h2,.draw-info h3,.no-sorteio h3,.erro-box h3,.sai-nome{
+  background:linear-gradient(135deg,#005b99,#009fe3) !important;
+  -webkit-background-clip:text !important;
+  -webkit-text-fill-color:transparent !important;
+  color:#006fb6 !important;
+  font-weight:900 !important;
+  text-shadow:none !important;
+}
+p,.page-header p,.login-sub,.sc-info,.modal-sub,.chip-hint,.sorteio-info,.un-wait,
+.sai-data,.stat-lbl,.sai-lbl,.vs-lbl,.sc-stat-lbl,.form-group label,.login-field label,
+.gss-label,.c-id,.bp-title,.un-label,.bingo-hint{
+  color:#315f82 !important;
+  font-weight:900 !important;
+}
+input,select,textarea{
+  background:#ffffff !important;
+  color:#06345b !important;
+  border:2px solid rgba(0,119,189,.28) !important;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.9) !important;
+}
+input::placeholder, textarea::placeholder{color:#6f91aa !important;font-weight:800 !important;}
+select option{background:#ffffff !important;color:#06345b !important;}
+.btn-primary,.btn-login,.btn-sortear,.btn-ativar,.win-close{
+  background:linear-gradient(135deg,#005b99 0%,#008bd2 55%,#00a6e8 100%) !important;
+  color:#ffffff !important;
+  border:none !important;
+  text-shadow:0 1px 2px rgba(0,0,0,.25) !important;
+  box-shadow:0 10px 26px rgba(0,119,189,.28) !important;
+}
+.btn-secondary,.btn-logout,.btn-reset-ap,.btn-danger,.btn-green,.btn-wpp,.tab-btn{
+  font-weight:900 !important;
+  border-width:2px !important;
+}
+.btn-secondary,.btn-logout,.tab-btn{
+  background:#ffffff !important;
+  color:#0063a6 !important;
+  border-color:rgba(0,119,189,.24) !important;
+}
+.tab-btn.active{
+  color:#005b99 !important;
+  border-bottom-color:#0077bd !important;
+  background:#e8f5ff !important;
+}
+.nav-badge,.badge-blue,.badge-yellow,.drawn-badge,.live-badge{
+  background:#e8f5ff !important;
+  color:#005b99 !important;
+  border:2px solid rgba(0,119,189,.24) !important;
+  font-weight:900 !important;
+}
+.badge-green,.sorteio-ativo-info{
+  background:rgba(0,166,200,.10) !important;
+  color:#007894 !important;
+  border:2px solid rgba(0,166,200,.24) !important;
+}
+.badge-red,.login-erro{
+  background:rgba(214,40,57,.08) !important;
+  color:#b51f2e !important;
+  border:2px solid rgba(214,40,57,.24) !important;
+}
+.toast{
+  background:#ffffff !important;
+  color:#06345b !important;
+  border:2px solid rgba(0,119,189,.25) !important;
+  box-shadow:0 12px 32px rgba(0,80,130,.18) !important;
+}
+.vendas-table th,.vendas-table td{
+  color:#06345b !important;
+  border-bottom:1px solid rgba(0,119,189,.14) !important;
+  font-weight:900 !important;
+}
+.vendas-table tr:hover td{background:#e8f5ff !important;}
+.chip,.modal-chip,.rec-i,.mball{
+  font-weight:900 !important;
+  border-width:2px !important;
+}
+.c-letters .c-l,.cpg-l,.bp-h{
+  color:#ffffff !important;
+  font-weight:900 !important;
+  text-shadow:0 1px 2px rgba(0,0,0,.25) !important;
+}
+.c-l.B,.cpg-l.B,.bp-h.B{background:#005b99 !important;}
+.c-l.I,.cpg-l.I,.bp-h.I{background:#008bd2 !important;}
+.c-l.N,.cpg-l.N,.bp-h.N{background:#00a6e8 !important;}
+.c-l.G,.cpg-l.G,.bp-h.G{background:#00b4d8 !important;}
+.c-l.O,.cpg-l.O,.bp-h.O{background:#003f73 !important;}
+.c-num,.cpg-num,.bp-num{
+  background:#ffffff !important;
+  color:#06345b !important;
+  border:2px solid rgba(0,119,189,.25) !important;
+  font-weight:900 !important;
+  text-shadow:none !important;
+}
+.c-num{font-size:1.15rem !important;}
+.c-num .num-front, .num-front{
+  color:#052f52 !important;
+  font-weight:1000 !important;
+  text-shadow:0 1px 0 #fff,0 0 5px rgba(0,119,189,.18) !important;
+}
+.c-num.free,.cpg-num.free{
+  background:linear-gradient(135deg,#005b99,#00a6e8) !important;
+  color:#ffffff !important;
+  border-color:transparent !important;
+  text-shadow:0 1px 2px rgba(0,0,0,.25) !important;
+}
+.c-num.marked{
+  background:#e4f4ff !important;
+  border-color:#0077bd !important;
+  box-shadow:inset 0 0 0 2px rgba(0,119,189,.18),0 0 0 2px rgba(0,119,189,.10) !important;
+}
+.c-num.marked .x-mark{
+  opacity:.68 !important;
+  filter:drop-shadow(0 1px 1px rgba(0,68,120,.25)) !important;
+}
+.bp-num.called{
+  color:#ffffff !important;
+  background:linear-gradient(135deg,#005b99,#009fe3) !important;
+  border-color:#004f8f !important;
+  font-weight:1000 !important;
+  box-shadow:0 5px 12px rgba(0,119,189,.25) !important;
+}
+.big-ball,.un-ball{
+  background:radial-gradient(circle at 30% 20%,#ffffff 0%,#e0f4ff 32%,#0077bd 100%) !important;
+  border:4px solid #005b99 !important;
+  box-shadow:0 12px 36px rgba(0,119,189,.32) !important;
+}
+.big-ball .bl,.big-ball .bn,.un-ball .un-l,.un-ball .un-n{
+  color:#ffffff !important;
+  text-shadow:0 2px 4px rgba(0,52,91,.45) !important;
+  font-weight:1000 !important;
+}
+.win-overlay{background:rgba(0,63,115,.92) !important;}
+.aviso-sorteio,.novo-numero-overlay,.novo-numero-card{
+  background:linear-gradient(135deg,#005b99,#009fe3) !important;
+  color:#ffffff !important;
+  text-shadow:0 2px 4px rgba(0,0,0,.25) !important;
+}
+@media(max-width:768px){
+  body{font-size:16px !important;}
+  .page,.main{padding:1rem !important;}
+  .nav,.header{gap:.5rem !important;}
+  .tab-btn{font-size:.82rem !important;}
+  .c-num{font-size:1.25rem !important;}
+  .rec-i{font-size:1rem !important;padding:.32rem .58rem !important;}
+}
+
+</style>
+
+<!-- Ícones do site / Atalho no celular -->
+<link rel="icon" href="favicon.ico" sizes="any">
+<link rel="icon" type="image/png" sizes="32x32" href="favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="favicon-16x16.png">
+<link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
+<link rel="manifest" href="site.webmanifest">
+<meta name="theme-color" content="#0d57a8">
+<meta name="apple-mobile-web-app-title" content="Bingo">
+<meta name="application-name" content="Bingo Brasil Online">
+</head>
+<body>
+
+<!-- LOGIN -->
+<div id="loginScreen">
+  <div class="login-box">
+    <div style="text-align:center;font-size:2rem;margin-bottom:0.5rem">🎙️</div>
+    <div class="login-logo">BingoFest</div>
+    <div class="login-sub">Painel do Apresentador</div>
+    <div class="login-field"><label>Usuário</label><input type="text" id="lUser" placeholder="Usuário" autocomplete="username"></div>
+    <div class="login-field"><label>Senha</label><input type="password" id="lPass" placeholder="Senha" autocomplete="current-password"></div>
+    <button class="btn-login" onclick="fazerLogin()">ENTRAR</button>
+    <div class="login-erro" id="lErro">❌ Usuário ou senha incorretos</div>
+  </div>
+</div>
+
+<!-- NAV -->
+<div class="nav">
+  <div class="logo">BingoFest — Apresentador</div>
+  <div class="nav-right">
+    <div class="fb-status"><div class="fb-dot" id="fbDot"></div><span id="fbStatus">Conectando...</span></div>
+    <button class="btn-logout" onclick="fazerLogout()">Sair</button>
+  </div>
+</div>
+
+<div class="page">
+
+  <!-- SELEÇÃO SORTEIO -->
+  <div class="sorteio-sel-box">
+    <div class="ssb-title">🏆 Selecionar Sorteio Ativo</div>
+    <div class="ssb-row">
+      <select class="ssb-sel" id="sorteioSel"><option value="">— Selecione um sorteio —</option></select>
+      <div class="modo-box" title="Como as cartelas dos jogadores serão marcadas durante este sorteio">
+        <span class="modo-title">Marcação</span>
+        <label class="modo-op"><input type="radio" name="modoMarcacao" value="auto" checked> Automática</label>
+        <label class="modo-op"><input type="radio" name="modoMarcacao" value="manual"> Manual</label>
+      </div>
+      <button class="btn-ativar" onclick="ativarSorteio()">▶ ATIVAR SORTEIO</button>
+    </div>
+    <div style="margin-top:1rem">
+      <div class="sorteio-ativo-info" id="sorteioAtivoInfo">
+        <div class="sai-nome" id="saiNome">—</div>
+        <div class="sai-produto" id="saiProduto">—</div>
+        <div class="sai-data" id="saiData">—</div>
+        <div class="sai-stats">
+          <div class="sai-stat"><div class="sai-val" id="saiJogadores">0</div><div class="sai-lbl">Jogadores</div></div>
+          <div class="sai-stat"><div class="sai-val" id="saiCartelas">0</div><div class="sai-lbl">Cartelas</div></div>
+          <div class="sai-stat"><div class="sai-val" id="saiSorteados">0</div><div class="sai-lbl">Sorteados</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SEM SORTEIO ATIVO -->
+  <div id="noSorteio" class="no-sorteio">
+    <div class="ni">🎱</div>
+    <h3>Nenhum Sorteio Selecionado</h3>
+    <p>Selecione um sorteio acima para começar a sortear os números.</p>
+  </div>
+
+  <!-- PAINEL SORTEIO -->
+  <div class="sorteio-panel" id="sorteioPanel">
+    <div class="ap-controls">
+      <div class="drawn-badge">Sorteados: <em id="apCount">0</em>/75</div>
+      <button class="btn-sortear" id="btnSortear" onclick="sortear()">🎱 SORTEAR ALEATÓRIO</button>
+      <div class="manual-draw-box">
+        <div class="manual-draw-label">Digitar número</div>
+        <input class="manual-draw-input" id="manualNumero" type="number" min="1" max="75" placeholder="1-75" onkeydown="if(event.key==='Enter') sortearManualNumero()">
+        <button class="btn-manual-draw" onclick="sortearManualNumero()">➕ REGISTRAR</button>
+        <div class="manual-draw-help">Use esta opção quando tirar as bolinhas em um recipiente. Digite o número que saiu e clique em registrar.</div>
+      </div>
+      <button class="btn-reset-ap" onclick="resetSorteio()">↺ Reiniciar Sorteio</button>
+    </div>
+    <div class="ap-layout">
+      <div class="draw-panel">
+        <div class="draw-top">
+          <div class="big-ball" id="apBall"><div class="bl" id="apBL">—</div><div class="bn" id="apBN">?</div></div>
+          <div class="draw-info"><h3 id="apTitle">Pronto para sortear</h3><p id="apSub">Clique em SORTEAR para começar</p></div>
+        </div>
+        <div style="font-size:0.65rem;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin-bottom:0.6rem">Últimos sorteados</div>
+        <div class="last-balls" id="apLastBalls"></div>
+      </div>
+      <div class="board-panel">
+        <div class="bp-title">Todos os Números</div>
+        <div class="bp-heads">
+          <div class="bp-h B">B</div><div class="bp-h I">I</div>
+          <div class="bp-h N">N</div><div class="bp-h G">G</div><div class="bp-h O">O</div>
+        </div>
+        <div class="bp-grid" id="apBoard"></div>
+      </div>
+    </div>
+
+    <div class="bingo-alert" id="bingoAlert">
+      <div class="ba-top">
+        <div>
+          <div class="ba-title" id="baTitle">🚨 BINGO CHAMADO!</div>
+          <div class="ba-sub" id="baSub">Aguardando conferência...</div>
+        </div>
+        <div class="ba-status" id="baStatus">Conferindo...</div>
+      </div>
+      <div class="ba-body">
+        <div class="ba-card">
+          <div style="font-size:0.62rem;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin-bottom:0.5rem">Cartela conferida</div>
+          <div class="ba-grid" id="baGrid"></div>
+        </div>
+        <div>
+          <div class="ba-info-line">Jogador: <strong id="baNome">—</strong></div>
+          <div class="ba-info-line">Cartela: <strong id="baCartela">—</strong></div>
+          <div class="ba-info-line">Resultado automático: <strong id="baResultado">—</strong></div>
+          <div class="ba-info-line">Faltando: <strong id="baFaltando">—</strong></div>
+          <div class="ba-actions">
+            <button class="btn-confirmar" id="btnConfirmarBingo" onclick="confirmarBingoAtual()">✅ CONFIRMAR GANHADOR</button>
+            <button class="btn-recusar" onclick="recusarBingoAtual()">❌ RECUSAR</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import { getDatabase, ref, set, get, onValue, remove, update } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
+
+const firebaseConfig={apiKey:"AIzaSyCtrgYYf2eBtGV6h2EQz99QUeIOZH3SKTY",authDomain:"bingo-9737e.firebaseapp.com",databaseURL:"https://bingo-9737e-default-rtdb.firebaseio.com",projectId:"bingo-9737e",storageBucket:"bingo-9737e.firebasestorage.app",messagingSenderId:"74980412774",appId:"1:74980412774:web:1eee26dd7849ea07ab0ca7"};
+const fbApp=initializeApp(firebaseConfig);
+const db=getDatabase(fbApp);
+
+onValue(ref(db,'sorteios'),()=>{document.getElementById('fbDot').className='fb-dot ok';document.getElementById('fbStatus').textContent='Firebase conectado';},()=>{document.getElementById('fbDot').className='fb-dot err';document.getElementById('fbStatus').textContent='Sem conexão';});
+
+const COLS=['B','I','N','G','O'];
+const RANGES={B:[1,15],I:[16,30],N:[31,45],G:[46,60],O:[61,75]};
+const ADMIN_USER='ADMIN',ADMIN_PASS='@ADMIN';
+function shuffle(a){for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;}
+function nomeCol(c){return{B:'Coluna B (1–15)',I:'Coluna I (16–30)',N:'Coluna N (31–45)',G:'Coluna G (46–60)',O:'Coluna O (61–75)'}[c];}
+function toastMsg(msg,type='ok'){const t=document.getElementById('toast');t.textContent=(type==='ok'?'✅ ':'❌ ')+msg;t.style.borderColor=type==='ok'?'rgba(61,255,192,0.3)':'rgba(255,82,82,0.3)';t.classList.add('show');setTimeout(()=>t.classList.remove('show'),3000);}
+
+// LOGIN
+window.fazerLogin=function(){
+  const u=document.getElementById('lUser').value.trim(),p=document.getElementById('lPass').value;
+  if(u===ADMIN_USER&&p===ADMIN_PASS){localStorage.setItem('bf_auth','ok');document.getElementById('loginScreen').style.display='none';carregarSorteios();}
+  else{document.getElementById('lErro').classList.add('show');document.getElementById('lPass').value='';setTimeout(()=>document.getElementById('lErro').classList.remove('show'),3000);}
+};
+window.fazerLogout=function(){localStorage.removeItem('bf_auth');window.location.href='index.html';};
+document.getElementById('lPass').addEventListener('keydown',e=>{if(e.key==='Enter')window.fazerLogin();});
+document.getElementById('lUser').addEventListener('keydown',e=>{if(e.key==='Enter')document.getElementById('lPass').focus();});
+if(localStorage.getItem('bf_auth')==='ok'){document.getElementById('loginScreen').style.display='none';carregarSorteios();}
+
+let sorteiosData={};
+let sorteioAtualId=null;
+let apPool=[],apDrawn=[];
+let unsubscribeSorteio=null;
+let claimAtual=null;
+let claimsVistos=new Set();
+
+function carregarSorteios(){
+  onValue(ref(db,'sorteios'),snap=>{
+    sorteiosData=snap.val()||{};
+    atualizarSelectSorteios();
+    // Se havia um sorteio ativo, manter
+    const ativoId=Object.keys(sorteiosData).find(k=>sorteiosData[k].status==='ativo');
+    if(ativoId&&ativoId!==sorteioAtualId){
+      document.getElementById('sorteioSel').value=ativoId;
+      carregarSorteioAtivo(ativoId);
+    }
+  });
+}
+
+function atualizarSelectSorteios(){
+  const sel=document.getElementById('sorteioSel');
+  const val=sel.value;
+  sel.innerHTML='<option value="">— Selecione um sorteio —</option>';
+  Object.values(sorteiosData).sort((a,b)=>b.ts-a.ts).forEach(s=>{
+    const st=s.status==='ativo'?'● ':'';
+    sel.innerHTML+=`<option value="${s.id}">${st}${s.nome} — ${s.produto}</option>`;
+  });
+  if(val)sel.value=val;
+}
+
+window.ativarSorteio=function(){
+  const id=document.getElementById('sorteioSel').value;
+  if(!id){toastMsg('Selecione um sorteio','err');return;}
+  const modoMarcacao=document.querySelector('input[name="modoMarcacao"]:checked')?.value||'auto';
+  const ativadoEm=Date.now();
+  // Desativar outros
+  Object.keys(sorteiosData).forEach(k=>{if(sorteiosData[k].status==='ativo')update(ref(db,'sorteios/'+k),{status:'aguardando'});});
+  update(ref(db,'sorteios/'+id),{status:'ativo',modoMarcacao,ativadoEm,notificacaoAtivacao:{tipo:'sorteio_ativado',modoMarcacao,ts:ativadoEm}}).then(()=>{
+    carregarSorteioAtivo(id);
+    toastMsg('Sorteio ativado com marcação '+(modoMarcacao==='auto'?'automática':'manual')+'!');
+  });
+};
+
+function carregarSorteioAtivo(id){
+  sorteioAtualId=id;
+  const s=sorteiosData[id];
+  if(!s)return;
+  const modoAtual=s.modoMarcacao||'auto';
+  const modoRadio=document.querySelector(`input[name="modoMarcacao"][value="${modoAtual}"]`);
+  if(modoRadio)modoRadio.checked=true;
+
+  // Info
+  document.getElementById('saiNome').textContent=s.nome;
+  document.getElementById('saiProduto').textContent='🏆 '+s.produto;
+  document.getElementById('saiData').textContent='📅 '+(s.data||'Data não definida')+' • Marcação: '+(modoAtual==='auto'?'automática':'manual');
+  document.getElementById('saiJogadores').textContent=s.totalJogadores||0;
+  document.getElementById('saiCartelas').textContent=s.totalCartelas||0;
+  document.getElementById('sorteioAtivoInfo').classList.add('show');
+
+  // Mostrar painel
+  document.getElementById('noSorteio').style.display='none';
+  document.getElementById('sorteioPanel').classList.add('show');
+
+  // Init pool e board
+  apPool=[];apDrawn=[];
+  for(const col of COLS){const[mn,mx]=RANGES[col];for(let n=mn;n<=mx;n++)apPool.push({n,col});}
+  shuffle(apPool);
+  renderBoard();
+  resetBallUI();
+
+  // Carregar números já sorteados
+  get(ref(db,'sorteios/'+id)).then(snap=>{
+    if(!snap.exists())return;
+    const data=snap.val();
+    const drawn=data.drawn||[];
+    if(drawn.length>0){
+      const drawnNums=new Set(drawn.map(d=>d.n));
+      apPool=apPool.filter(x=>!drawnNums.has(x.n));
+      apDrawn=drawn;
+      drawn.forEach(({n,col})=>{
+        const cell=document.getElementById('bpn-'+n);
+        if(cell)cell.className='bp-num called '+col;
+      });
+      const lb=document.getElementById('apLastBalls');lb.innerHTML='';
+      drawn.slice(-9).forEach(({n,col})=>{const mb=document.createElement('div');mb.className='mball '+col;mb.textContent=n;lb.appendChild(mb);});
+      const last=drawn[drawn.length-1];
+      const ball=document.getElementById('apBall');
+      ball.className='big-ball '+last.col;
+      document.getElementById('apBL').textContent=last.col;
+      document.getElementById('apBN').textContent=last.n;
+      document.getElementById('apTitle').textContent=last.col+' — '+last.n;
+      document.getElementById('apSub').textContent=nomeCol(last.col)+', número '+last.n;
+      document.getElementById('apCount').textContent=drawn.length;
+      document.getElementById('saiSorteados').textContent=drawn.length;
+      if(apPool.length===0)document.getElementById('btnSortear').disabled=true;
+    }
+    iniciarEscutaBingos(id);
+  });
+}
+
+function renderBoard(){
+  const g=document.getElementById('apBoard');g.innerHTML='';
+  for(const col of COLS){const[mn,mx]=RANGES[col];for(let n=mn;n<=mx;n++){const d=document.createElement('div');d.className='bp-num';d.id='bpn-'+n;d.textContent=n;g.appendChild(d);}}
+}
+
+function resetBallUI(){
+  document.getElementById('apBall').className='big-ball';
+  document.getElementById('apBL').textContent='—';
+  document.getElementById('apBN').textContent='?';
+  document.getElementById('apTitle').textContent='Pronto para sortear';
+  document.getElementById('apSub').textContent='Clique em SORTEAR para começar';
+  document.getElementById('apLastBalls').innerHTML='';
+  document.getElementById('apCount').textContent='0';
+  document.getElementById('saiSorteados').textContent='0';
+  document.getElementById('btnSortear').disabled=false;
+}
+
+
+function iniciarEscutaBingos(id){
+  claimAtual=null;claimsVistos=new Set();
+  esconderBingoAlert();
+  onValue(ref(db,'reivindicacoes/'+id),snap=>{
+    const dados=snap.val()||{};
+    const pendentes=Object.values(dados).filter(c=>c.status==='pendente').sort((a,b)=>(b.ts||0)-(a.ts||0));
+    if(!pendentes.length)return;
+    const claim=pendentes[0];
+    if(claimAtual&&claimAtual.id===claim.id)return;
+    claimAtual=conferirClaim(claim);
+    mostrarBingoAlert(claimAtual);
+    if(!claimsVistos.has(claim.id)){
+      claimsVistos.add(claim.id);
+      toastMsg('BINGO chamado por '+(claim.nome||'jogador')+'!');
+    }
+  });
+}
+
+function conferirClaim(claim){
+  const sorteados=new Set(apDrawn.map(d=>Number(d.n)));
+  const numeros=(claim.numeros||[]).map(Number).filter(n=>!Number.isNaN(n));
+  const faltando=numeros.filter(n=>!sorteados.has(n));
+  const valido=numeros.length===24&&faltando.length===0;
+  return {...claim,numeros,faltando,valido};
+}
+
+function montarPreviewClaim(claim){
+  const grid=document.getElementById('baGrid');grid.innerHTML='';
+  const sorteados=new Set(apDrawn.map(d=>Number(d.n)));
+  const matriz=Array.isArray(claim.matriz)?claim.matriz:null;
+  const nums=(claim.numeros||[]).map(Number);
+  let k=0;
+  for(let row=0;row<5;row++){
+    for(let col=0;col<5;col++){
+      const cell=document.createElement('div');
+      if(row===2&&col===2){cell.className='ba-cell free';cell.textContent='FREE';}
+      else{
+        const n=matriz&&matriz[col]?Number(matriz[col][row]):nums[k++];
+        cell.textContent=n||'—';
+        cell.className='ba-cell '+(sorteados.has(n)?'ok':'');
+      }
+      grid.appendChild(cell);
+    }
+  }
+}
+
+function mostrarBingoAlert(claim){
+  const box=document.getElementById('bingoAlert');
+  box.className='bingo-alert show '+(claim.valido?'':'invalid');
+  document.getElementById('baTitle').textContent=claim.valido?'🚨 BINGO VÁLIDO CHAMADO!':'⚠️ BINGO CHAMADO, MAS INVÁLIDO';
+  document.getElementById('baSub').textContent='O sistema conferiu automaticamente usando os números já sorteados.';
+  document.getElementById('baStatus').className='ba-status '+(claim.valido?'':'err');
+  document.getElementById('baStatus').textContent=claim.valido?'VÁLIDO':'INVÁLIDO';
+  document.getElementById('baNome').textContent=claim.nome||'—';
+  document.getElementById('baCartela').textContent='#'+(claim.cartelaId||'—');
+  document.getElementById('baResultado').textContent=claim.valido?'Cartela cheia: todos os 24 números já saíram.':'Ainda faltam números sorteados.';
+  document.getElementById('baFaltando').textContent=claim.faltando.length?claim.faltando.join(', '):'Nenhum';
+  document.getElementById('btnConfirmarBingo').disabled=!claim.valido;
+  montarPreviewClaim(claim);
+  box.scrollIntoView({behavior:'smooth',block:'center'});
+}
+
+function esconderBingoAlert(){
+  const box=document.getElementById('bingoAlert');
+  if(box)box.className='bingo-alert';
+}
+
+window.confirmarBingoAtual=function(){
+  if(!claimAtual||!sorteioAtualId)return;
+  if(!claimAtual.valido){toastMsg('Não é possível confirmar: a cartela ainda não está cheia.','err');return;}
+  const updates={};
+  updates['reivindicacoes/'+sorteioAtualId+'/'+claimAtual.id+'/status']='confirmado';
+  updates['reivindicacoes/'+sorteioAtualId+'/'+claimAtual.id+'/confirmadoEm']=Date.now();
+  updates['sorteios/'+sorteioAtualId+'/ganhador']={nome:claimAtual.nome||'',cartelaId:claimAtual.cartelaId||'',claimId:claimAtual.id,ts:Date.now()};
+  update(ref(db),updates).then(()=>{
+    toastMsg('Ganhador confirmado!');
+    spawnConfetti();
+    esconderBingoAlert();
+  });
+};
+
+window.recusarBingoAtual=function(){
+  if(!claimAtual||!sorteioAtualId)return;
+  update(ref(db,'reivindicacoes/'+sorteioAtualId+'/'+claimAtual.id),{status:'recusado',recusadoEm:Date.now()}).then(()=>{
+    toastMsg('BINGO recusado.');
+    esconderBingoAlert();
+    claimAtual=null;
+  });
+};
+
+function spawnConfetti(){
+  const colors=['#f7c948','#ff4d8d','#4d9fff','#3dffc0','#b06dff','#fff'];
+  for(let i=0;i<90;i++){
+    const el=document.createElement('div');
+    el.style.cssText=`position:fixed;z-index:999;pointer-events:none;left:${Math.random()*100}vw;top:-30px;background:${colors[Math.floor(Math.random()*colors.length)]};border-radius:${Math.random()>.5?'50%':'2px'};width:${Math.random()*10+5}px;height:${Math.random()*10+5}px;animation:cffall ${Math.random()*2+1.5}s linear forwards;`;
+    document.body.appendChild(el);setTimeout(()=>el.remove(),4000);
+  }
+}
+
+function colunaPorNumero(n){
+  n=Number(n);
+  for(const col of COLS){
+    const [mn,mx]=RANGES[col];
+    if(n>=mn&&n<=mx)return col;
+  }
+  return null;
+}
+
+function numeroJaSorteado(n){
+  return apDrawn.some(d=>Number(d.n)===Number(n));
+}
+
+function registrarNumeroSorteado(n, origem='manual'){
+  if(!sorteioAtualId){toastMsg('Nenhum sorteio ativo','err');return false;}
+  n=Number(n);
+  const col=colunaPorNumero(n);
+  if(!col){toastMsg('Digite um número de 1 a 75.','err');return false;}
+  if(numeroJaSorteado(n)){toastMsg('O número '+n+' já foi sorteado.','err');return false;}
+
+  apPool=apPool.filter(x=>Number(x.n)!==n);
+  apDrawn.push({n,col,origem,ts:Date.now()});
+  const newSorteioId=sorteiosData[sorteioAtualId]?.sorteioId||sorteioAtualId;
+  update(ref(db,'sorteios/'+sorteioAtualId),{drawn:apDrawn,sorteioId:newSorteioId,ts:Date.now()});
+
+  const cell=document.getElementById('bpn-'+n);
+  if(cell)cell.className='bp-num called '+col;
+
+  const ball=document.getElementById('apBall');
+  ball.className='big-ball '+col+' pop';
+  setTimeout(()=>ball.classList.remove('pop'),600);
+  document.getElementById('apBL').textContent=col;
+  document.getElementById('apBN').textContent=n;
+  document.getElementById('apTitle').textContent=col+' — '+n;
+  document.getElementById('apSub').textContent=(origem==='manual'?'Registrado manualmente: ':'')+nomeCol(col)+', número '+n;
+  document.getElementById('apCount').textContent=apDrawn.length;
+  document.getElementById('saiSorteados').textContent=apDrawn.length;
+
+  const lb=document.getElementById('apLastBalls');
+  const mb=document.createElement('div');mb.className='mball '+col;mb.textContent=n;
+  lb.insertBefore(mb,lb.firstChild);
+  if(lb.children.length>9)lb.removeChild(lb.lastChild);
+
+  if(apPool.length===0)document.getElementById('btnSortear').disabled=true;
+  return true;
+}
+
+window.sortear=function(){
+  if(!sorteioAtualId){toastMsg('Nenhum sorteio ativo','err');return;}
+  if(apPool.length===0){toastMsg('Todos os números já foram sorteados.','err');return;}
+  const {n}=apPool[Math.floor(Math.random()*apPool.length)];
+  registrarNumeroSorteado(n,'automatico');
+};
+
+window.sortearManualNumero=function(){
+  const input=document.getElementById('manualNumero');
+  const n=Number(input.value);
+  if(registrarNumeroSorteado(n,'manual')){
+    input.value='';
+    input.focus();
+    toastMsg('Número '+n+' registrado no sorteio!');
+  }
+};
+
+window.resetSorteio=function(){
+  if(!sorteioAtualId){toastMsg('Nenhum sorteio ativo','err');return;}
+  const s=sorteiosData[sorteioAtualId];
+  if(!confirm(`Reiniciar o sorteio "${s?.nome}"?\n\nTodos os números serão apagados e as cartelas dos jogadores serão zeradas automaticamente.`))return;
+  const novoSorteioId=sorteioAtualId+'_'+Date.now().toString(36);
+  update(ref(db,'sorteios/'+sorteioAtualId),{drawn:[],sorteioId:novoSorteioId,ts:Date.now()});
+  remove(ref(db,'reivindicacoes/'+sorteioAtualId)).then(()=>{
+    apPool=[];apDrawn=[];
+    for(const col of COLS){const[mn,mx]=RANGES[col];for(let n=mn;n<=mx;n++)apPool.push({n,col});}
+    shuffle(apPool);
+    renderBoard();resetBallUI();
+    toastMsg('Sorteio reiniciado! Cartelas dos jogadores foram zeradas.');
+  });
+};
+</script>
+</body>
+</html>
