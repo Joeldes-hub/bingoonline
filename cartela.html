@@ -1021,7 +1021,6 @@ function iniciar(){
   let sorteioIdAtual=null;
   let ativadoEmAtual=null;
   let modoMarcacaoAtual='auto';
-  let statusSorteioAtual='aguardando';
   let claimIdAtual=null;
   let claimListenerStarted=false;
   let carregamentoInicialSorteio=true;
@@ -1126,14 +1125,10 @@ function iniciar(){
     const fbProduto=fbData.produto||'';
     const fbAtivadoEm=fbData.ativadoEm||null;
     modoMarcacaoAtual=fbData.modoMarcacao||'auto';
-    statusSorteioAtual=fbData.status||'aguardando';
 
-    const statusLabel=statusSorteioAtual==='ativo'?'ATIVO':statusSorteioAtual==='encerrado'?'ENCERRADO':'AGUARDANDO';
-    const statusInfoHtml=`<strong>${fbNome}</strong>${fbProduto?' - '+fbProduto:''} - ${statusLabel} - Marcacao: ${modoMarcacaoAtual==='auto'?'automatica':'manual'}`;
     // Info do sorteio no header
     document.getElementById('sorteioInfoBar').innerHTML=`<strong>${fbNome}</strong>${fbProduto?' — '+fbProduto:''} • Marcação: ${modoMarcacaoAtual==='auto'?'automática':'manual'}`;
 
-    document.getElementById('sorteioInfoBar').innerHTML=statusInfoHtml;
     // Avisar jogadores quando o apresentador clicar em ATIVAR SORTEIO.
     if(ativadoEmAtual!==null&&fbAtivadoEm&&fbAtivadoEm!==ativadoEmAtual){
       mostrarAvisoSorteioTexto('🎙️ SORTEIO ATIVADO! Marcação '+(modoMarcacaoAtual==='auto'?'automática':'manual')+'.');
@@ -1169,7 +1164,6 @@ function iniciar(){
     carregamentoInicialSorteio=false;
     document.getElementById('stChamados').textContent=drawn.length;
     atualizarStats();
-    checarBingo();
   },()=>{document.getElementById('connDot').className='conn-dot';});
 
   // Aviso em tempo real para TODOS os jogadores quando alguém chama BINGO.
@@ -1421,11 +1415,6 @@ function iniciar(){
       if(wrap)wrap.classList.toggle('bingo-hit',cheia);
     });
     const btn=document.getElementById('btnBingo');
-    if(statusSorteioAtual!=='ativo'){
-      btn.className='btn-bingo';btn.disabled=true;
-      document.getElementById('bingoHint').textContent=statusSorteioAtual==='encerrado'?'Sorteio encerrado. Nao e mais possivel chamar BINGO.':'Aguardando o apresentador ativar o sorteio.';
-      return;
-    }
     if(valido&&!bingoTriggered){
       btn.className='btn-bingo ready';btn.disabled=false;
       btn.dataset.cartelaId=valido.jc.id;
@@ -1472,11 +1461,6 @@ function iniciar(){
 
   document.getElementById('btnBingo').onclick=async function(){
     if(bingoTriggered)return;
-    if(statusSorteioAtual!=='ativo'){
-      mostrarClaimStatus(statusSorteioAtual==='encerrado'?'Sorteio encerrado. BINGO bloqueado.':'Aguarde o apresentador ativar o sorteio.', 'err');
-      checarBingo();
-      return;
-    }
     const valido=primeiraCartelaValida();
     if(!valido){mostrarClaimStatus('⚠️ Marque todos os 24 números da cartela para enviar à conferência.', 'err');checarBingo();return;}
     bingoTriggered=true;

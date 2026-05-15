@@ -726,7 +726,7 @@ function renderSorteios(){
         <div class="sc-stat"><div class="sc-stat-val">${drawn}/75</div><div class="sc-stat-lbl">Sorteados</div></div>
       </div>
       <div class="sc-actions">
-        ${s.status==='aguardando'?`<button class="btn-green" onclick="ativarSorteio('${s.id}')">▶ Ativar</button>`:''}
+        ${s.status!=='ativo'?`<button class="btn-green" onclick="ativarSorteio('${s.id}')">▶ Ativar</button>`:''}
         ${s.status==='ativo'?`<button class="btn-secondary" onclick="encerrarSorteio('${s.id}')">⏹ Encerrar</button>`:''}
         <button class="btn-danger" onclick="deletarSorteioCompleto('${s.id}','${s.nome}')">🗑 Excluir Sorteio e Cartelas</button>
       </div>`;
@@ -738,7 +738,7 @@ window.ativarSorteio=function(id){
   Object.keys(sorteiosData).forEach(k=>{if(sorteiosData[k].status==='ativo')update(ref(db,'sorteios/'+k),{status:'aguardando'});});
   update(ref(db,'sorteios/'+id),{status:'ativo'});toastMsg('Sorteio ativado!');
 };
-window.encerrarSorteio=function(id){update(ref(db,'sorteios/'+id),{status:'encerrado',encerradoEm:Date.now()});toastMsg('Sorteio encerrado');};
+window.encerrarSorteio=function(id){update(ref(db,'sorteios/'+id),{status:'encerrado'});toastMsg('Sorteio encerrado');};
 window.deletarSorteioCompleto=function(id,nome){
   if(!confirm(`Excluir o sorteio "${nome}" e TODAS as cartelas e vendas relacionadas?\n\nEsta ação não pode ser desfeita.`)) return;
   remove(ref(db,'sorteios/'+id));
@@ -774,7 +774,6 @@ window.gerarCartelas=async function(){
   const sorteioId=document.getElementById('genSorteioSel').value;
   if(!sorteioId){toastMsg('Selecione um sorteio primeiro','err');return;}
   const sorteio=sorteiosData[sorteioId];
-  if(sorteio.status==='encerrado'){toastMsg('Este sorteio esta encerrado. Crie ou ative outro sorteio para gerar cartelas.','err');return;}
   const nome=document.getElementById('genNome').value.trim();
   const wpp=document.getElementById('genWpp').value.trim();
   const qtd=parseInt(document.getElementById('genQtd').value)||1;

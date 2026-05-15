@@ -841,7 +841,6 @@ function carregarSorteioAtivo(id){
   document.getElementById('saiJogadores').textContent=s.totalJogadores||0;
   document.getElementById('saiCartelas').textContent=s.totalCartelas||0;
   document.getElementById('sorteioAtivoInfo').classList.add('show');
-  document.getElementById('btnSortear').disabled=s.status!=='ativo';
 
   // Mostrar painel
   document.getElementById('noSorteio').style.display='none';
@@ -1030,7 +1029,6 @@ function numeroJaSorteado(n){
 
 function registrarNumeroSorteado(n, origem='manual'){
   if(!sorteioAtualId){toastMsg('Nenhum sorteio ativo','err');return false;}
-  if((sorteiosData[sorteioAtualId]?.status||'aguardando')!=='ativo'){toastMsg('Este sorteio nao esta ativo. Ative antes de sortear.','err');return false;}
   n=Number(n);
   const col=colunaPorNumero(n);
   if(!col){toastMsg('Digite um número de 1 a 75.','err');return false;}
