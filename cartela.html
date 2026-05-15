@@ -110,9 +110,12 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;
 .cartela-wrap{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:0.7rem;transition:border-color 0.3s;}
 .cartela-wrap.bingo-hit{border-color:rgba(61,255,192,0.5);box-shadow:0 0 20px rgba(61,255,192,0.1);}
 .cartela-wrap.nav-selected{border-color:rgba(247,201,72,0.62);box-shadow:0 0 0 2px rgba(247,201,72,0.08),0 0 20px rgba(247,201,72,0.08);}
+.cartela-wrap.inativa{opacity:0.56;border-color:rgba(255,82,82,0.35);}
+.cartela-wrap.inativa .c-grid{filter:grayscale(0.85);}
 .c-id{font-size:0.58rem;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin-bottom:0.45rem;display:flex;align-items:center;justify-content:space-between;}
 .c-bingo-tag{background:linear-gradient(135deg,var(--green),#2be8a8);color:#07070e;font-size:0.52rem;font-weight:900;letter-spacing:1px;padding:0.12rem 0.4rem;border-radius:3px;display:none;}
 .c-bingo-tag.show{display:block;}
+.c-status-tag{background:rgba(255,82,82,0.14);border:1px solid rgba(255,82,82,0.35);color:var(--red);font-size:0.52rem;font-weight:900;letter-spacing:1px;padding:0.12rem 0.4rem;border-radius:3px;}
 .c-letters{display:grid;grid-template-columns:repeat(5,1fr);gap:3px;margin-bottom:3px;}
 .c-l{text-align:center;font-family:'Bebas Neue',sans-serif;font-size:0.88rem;letter-spacing:2px;padding:0.28rem;border-radius:5px;}
 .c-l.B{color:var(--B);background:rgba(77,159,255,0.12)}.c-l.I{color:var(--I);background:rgba(247,201,72,0.12)}
@@ -1514,16 +1517,24 @@ function iniciar(){
   function renderCartelas(){
     const container=document.getElementById('cartelasContainer');
     container.innerHTML='';
-    const ativas=jogCartelas.map((jc,idx)=>({jc,idx})).filter(x=>x.jc.ativa);
-    if(!ativas.length){
+    const todas=jogCartelas.map((jc,idx)=>({jc,idx}));
+    const ativas=todas.filter(x=>x.jc.ativa);
+    if(!todas.length){
       container.innerHTML=`<div class="erro-box"><div class="ei">🗑️</div><h3>Nenhuma cartela ativa</h3><p>As cartelas deste link foram removidas pelo administrador.</p></div>`;
       return;
     }
-    if(!ativas.some(item=>item.idx===cartelaSelecionadaIdx))cartelaSelecionadaIdx=ativas[0].idx;
-    const usarNavegador=ativas.length>LIMITE_GRADE_CARTELAS;
-    if(usarNavegador)container.appendChild(buildCartelasNav(ativas));
+    if(!todas.some(item=>item.idx===cartelaSelecionadaIdx))cartelaSelecionadaIdx=todas[0].idx;
+    const usarNavegador=todas.length>LIMITE_GRADE_CARTELAS;
+    if(usarNavegador)container.appendChild(buildCartelasNav(todas));
+    if(ativas.length<todas.length){
+      const aviso=document.createElement('div');
+      aviso.className='claim-status show err';
+      aviso.style.display='block';
+      aviso.textContent=`Este link tem ${todas.length} cartelas, mas ${ativas.length} estao ativas no banco. Cartelas inativas aparecem bloqueadas.`;
+      container.appendChild(aviso);
+    }
     const grid=document.createElement('div');grid.className='cartelas-grid';
-    const visiveis=ativas;
+    const visiveis=todas;
     const n=visiveis.length;
     if(n===1)grid.classList.add('c1');
     else if(n===2)grid.classList.add('c2');
@@ -1616,8 +1627,19 @@ function iniciar(){
   function buildCartela(jc,idx){
     const wrap=document.createElement('div');wrap.className='cartela-wrap';wrap.id='cw-'+idx;
     if(idx===cartelaSelecionadaIdx)wrap.classList.add('nav-selected');
+    if(!jc.ativa)wrap.classList.add('inativa');
     const hdr=document.createElement('div');hdr.className='c-id';
     hdr.innerHTML=`<span>Cartela #${jc.id}</span><span class="c-bingo-tag" id="cbt-${idx}">✓ BINGO!</span>`;
+    if(!jc.ativa){
+      hdr.innerHTML='';
+      const label=document.createElement('span');
+      label.textContent='Cartela #'+jc.id;
+      const tag=document.createElement('span');
+      tag.className='c-status-tag';
+      tag.textContent='INATIVA';
+      hdr.appendChild(label);
+      hdr.appendChild(tag);
+    }
     wrap.appendChild(hdr);
     const lets=document.createElement('div');lets.className='c-letters';
     COLS.forEach(c=>{const d=document.createElement('div');d.className='c-l '+c;d.textContent=c;lets.appendChild(d);});
@@ -1639,6 +1661,7 @@ function iniciar(){
           cell.onclick=(ev)=>{
             ev.preventDefault();
             ev.stopPropagation();
+            if(!jc.ativa){mostrarClaimStatus('Esta cartela esta inativa no banco. PeÃ§a ao administrador para conferir a venda.', 'err');return;}
             const num=parseInt(cell.dataset.n);
             const coluna=cell.dataset.col;
             marcarNasCartelas(num,coluna,true);
